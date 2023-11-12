@@ -136,7 +136,7 @@ const Footprint: CollectionConfig = {
                         width: "50%",
                       },
                       hooks: {
-                        afterRead: [
+                        beforeValidate: [
                           (args) => {
                             const { originalDoc } = args;
                             const logs: {
@@ -174,7 +174,7 @@ const Footprint: CollectionConfig = {
                         width: "50%",
                       },
                       hooks: {
-                        afterRead: [
+                        beforeValidate: [
                           (args) => {
                             const { originalDoc } = args;
                             const logs: {
@@ -210,7 +210,7 @@ const Footprint: CollectionConfig = {
                   name: "year",
                   type: "number",
                   hooks: {
-                    afterRead: [
+                    beforeValidate: [
                       (args) => {
                         const { originalDoc } = args;
                         const logs: { timestamp: string; emission: number }[] =
@@ -263,7 +263,7 @@ const Footprint: CollectionConfig = {
                         width: "50%",
                       },
                       hooks: {
-                        afterRead: [
+                        beforeValidate: [
                           (args) => {
                             const { originalDoc } = args;
                             const logs: {
@@ -294,7 +294,7 @@ const Footprint: CollectionConfig = {
                         width: "50%",
                       },
                       hooks: {
-                        afterRead: [
+                        beforeValidate: [
                           (args) => {
                             const { originalDoc } = args;
                             const logs: {
@@ -323,7 +323,7 @@ const Footprint: CollectionConfig = {
                   name: "year",
                   type: "number",
                   hooks: {
-                    afterRead: [
+                    beforeValidate: [
                       (args) => {
                         const { originalDoc } = args;
                         const logs: { timestamp: string; emission: number }[] =

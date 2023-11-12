@@ -106,3 +106,34 @@ export interface UserProps {
   token: string;
   user: User;
 }
+
+export interface TodayLogsProps {
+  emission_stats: EmissionStats;
+  logs: Log[];
+}
+
+export interface EmissionStats {
+  average_emission: AverageEmission;
+  total_emission: TotalEmission;
+}
+
+export interface AverageEmission {
+  today: number;
+  month: number;
+  year: number;
+}
+
+export interface TotalEmission {
+  today: number;
+  month: number;
+  year: number;
+}
+
+export interface Log {
+  timestamp: string;
+  activity: string;
+  distance: number;
+  people: number;
+  emission: number;
+  id: string;
+}
