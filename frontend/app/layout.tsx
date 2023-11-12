@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/navbar";
 import "./globals.css";
 
 import type { Metadata } from "next";
@@ -15,12 +16,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${quicksand.className} font-normal`}>{children}</body>
+      <body className={`${quicksand.className} font-normal`}>
+        <Navbar />
+        {children}
+        {modal}
+      </body>
     </html>
   );
 }
