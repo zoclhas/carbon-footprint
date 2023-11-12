@@ -14,7 +14,7 @@ export const PasswordInput = ({ name = "password" }: { name?: string }) => {
       type={visible ? "text" : "password"}
       label="Password"
       size="lg"
-      required
+      isRequired
       endContent={
         <Button
           isIconOnly

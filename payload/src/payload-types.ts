@@ -22,6 +22,9 @@ export interface User {
   roles?: ('admin' | 'user')[] | null;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -34,6 +37,16 @@ export interface User {
 export interface Footprint {
   id: string;
   user: string | User;
+  logs?:
+    | {
+        timestamp: string;
+        activity: 'car' | 'bus' | 'metro' | 'cycle' | 'walk' | 'plane';
+        distance: number;
+        people: number;
+        emission?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   emission_stats?: {
     average_emission?: {
       today?: number | null;
@@ -46,16 +59,6 @@ export interface Footprint {
       year?: number | null;
     };
   };
-  logs?:
-    | {
-        timestamp: string;
-        activity: 'car' | 'bus' | 'metro' | 'cycle' | 'walk' | 'plane';
-        distance: number;
-        people: number;
-        emission?: number | null;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
 }

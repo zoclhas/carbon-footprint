@@ -47,7 +47,7 @@ const Users: CollectionConfig = {
       ],
       hooks: {
         beforeChange: [ensureFirstUserIsAdmin],
-        beforeValidate: [
+        afterChange: [
           async (args) => {
             const uid = args.originalDoc.id;
             const footprint = await payload.find({

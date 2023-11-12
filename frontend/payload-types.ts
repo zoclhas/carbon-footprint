@@ -100,3 +100,9 @@ export interface PayloadMigration {
   updatedAt: string;
   createdAt: string;
 }
+export interface UserProps {
+  exp: number;
+  message: string;
+  token: string;
+  user: User;
+}

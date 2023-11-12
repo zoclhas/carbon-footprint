@@ -4,8 +4,8 @@ import {
   NavbarContent,
   NavbarItem,
   Link,
-  Button,
 } from "@nextui-org/react";
+import { Login } from "./login";
 
 export const Navbar = () => {
   return (
@@ -15,6 +15,8 @@ export const Navbar = () => {
           <h1 className="font-medium text-xl">CarbTrkr</h1>
         </Link>
       </NavbarBrand>
+
+      <Login />
     </NextUINavbar>
   );
 };
