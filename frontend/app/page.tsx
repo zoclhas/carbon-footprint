@@ -60,7 +60,7 @@ export default function Home() {
             />
           </clipPath>
         </defs>
-        <g clip-path="url(#a)">
+        <g clipPath="url(#a)">
           <path
             fill="#16c15f"
             d="M829.5 642.5Q839 785 713 888.5t-252 0Q335 785 206 719.5T123.5 517q46.5-137 110-253T425 175q128 27 280.5 25.5t133.5 149q-19 150.5-9.5 293Z"

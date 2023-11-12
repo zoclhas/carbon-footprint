@@ -12,6 +12,25 @@ const Users: CollectionConfig = {
   slug: "users",
   auth: {
     useAPIKey: true,
+    forgotPassword: {
+      generateEmailHTML: ({ req, token, user }) => {
+        // Use the token provided to allow your user to reset their password
+        const resetPasswordURL = `${process.env.FE_URL}/login/reset?token=${token}`;
+
+        return `
+          <!doctype html>
+          <html>
+            <body>
+              <p>Hello, ${user.name}!</p>
+              <p>Click below to reset your password.</p>
+              <p>
+                <a href="${resetPasswordURL}">${resetPasswordURL}</a>
+              </p>
+            </body>
+          </html>
+        `;
+      },
+    },
   },
   admin: {
     useAsTitle: "email",
