@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Reset Password | CarbTrkr",
 };
 
-export default function Login({
+export default function Reset({
   searchParams,
 }: {
   searchParams: { message: string; token: string };

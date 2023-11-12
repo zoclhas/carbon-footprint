@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Did you forget your password? Change it here.",
 };
 
-export default function Login({
+export default function Forgot({
   searchParams,
 }: {
   searchParams: { message: string };

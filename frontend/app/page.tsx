@@ -70,8 +70,11 @@ export default function Home() {
 
       <section id="more" className="mx-auto max-w-7xl px-4 pb-6">
         <ul className="flex flex-col gap-12">
-          {more.map((m) => (
-            <li className="p-4 rounded-2xl backdrop-blur-2xl bg-default-50/40">
+          {more.map((m, i) => (
+            <li
+              key={i}
+              className="p-4 rounded-2xl backdrop-blur-2xl bg-default-50/40"
+            >
               <h1 className="text-4xl font-medium">{m.q}</h1>
               <p className="text-xl mt-2">{m.a}</p>
             </li>
