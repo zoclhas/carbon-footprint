@@ -6,6 +6,7 @@ import { checkRole } from "./checkRole";
 
 import { admins } from "../../access/admins";
 import { anyone } from "../../access/access";
+import payload from "payload";
 
 const Users: CollectionConfig = {
   slug: "users",
@@ -46,6 +47,32 @@ const Users: CollectionConfig = {
       ],
       hooks: {
         beforeChange: [ensureFirstUserIsAdmin],
+        beforeValidate: [
+          async (args) => {
+            const uid = args.originalDoc.id;
+            const footprint = await payload.find({
+              collection: "footprint",
+              where: {
+                and: [
+                  {
+                    "user.id": {
+                      equals: uid,
+                    },
+                  },
+                ],
+              },
+            });
+
+            if (footprint.totalDocs === 0) {
+              await payload.create({
+                collection: "footprint",
+                data: {
+                  user: uid,
+                },
+              });
+            }
+          },
+        ],
       },
       access: {
         read: admins,

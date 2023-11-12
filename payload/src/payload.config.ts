@@ -51,11 +51,6 @@ export default buildConfig({
                     equals: uid,
                   },
                 },
-                {
-                  "logs.activity": {
-                    equals: "car",
-                  },
-                },
               ],
             },
           });
