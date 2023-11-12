@@ -24,7 +24,7 @@ export default function RootLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${quicksand.className} font-normal`}>
         <Providers>
           <Navbar />
