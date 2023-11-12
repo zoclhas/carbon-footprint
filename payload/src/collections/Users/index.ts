@@ -9,7 +9,9 @@ import { anyone } from "../../access/access";
 
 const Users: CollectionConfig = {
   slug: "users",
-  auth: true,
+  auth: {
+    useAPIKey: true,
+  },
   admin: {
     useAsTitle: "email",
     defaultColumns: ["name", "email"],

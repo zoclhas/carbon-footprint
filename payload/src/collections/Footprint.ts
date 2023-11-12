@@ -19,237 +19,6 @@ const Footprint: CollectionConfig = {
     },
 
     {
-      name: "emission_stats",
-      label: "Emission Stats",
-      type: "group",
-      fields: [
-        {
-          type: "row",
-          fields: [
-            {
-              name: "average_emission",
-              label: "Average Emission",
-              type: "group",
-              fields: [
-                {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "today",
-                      type: "number",
-                      admin: {
-                        width: "50%",
-                      },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const today = new Date()
-                              .toISOString()
-                              .split("T")[0];
-                            const todayLogs = logs.filter(
-                              (log) => log.timestamp.split("T")[0] === today
-                            );
-                            const totalEmission = todayLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-                            const avgEmission =
-                              totalEmission / todayLogs.length;
-
-                            return avgEmission.toFixed(2);
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      name: "month",
-                      type: "number",
-                      admin: {
-                        width: "50%",
-                      },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const month = new Date().getMonth() + 1;
-                            const monthLogs = logs.filter(
-                              (log) =>
-                                log.timestamp.split("-")[1] === String(month)
-                            );
-                            const totalEmission = monthLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-                            const avgEmission =
-                              totalEmission / monthLogs.length;
-
-                            return avgEmission.toFixed(2);
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-                {
-                  name: "year",
-                  type: "number",
-                  hooks: {
-                    beforeValidate: [
-                      (args) => {
-                        const { originalDoc } = args;
-                        const logs: { timestamp: string; emission: number }[] =
-                          originalDoc.logs;
-
-                        const year = new Date().getFullYear();
-                        const yearLogs = logs.filter(
-                          (log) => log.timestamp.split("-")[0] === String(year)
-                        );
-                        const totalEmission = yearLogs.reduce(
-                          (total, log) => total + log.emission,
-                          0
-                        );
-                        const avgEmission = totalEmission / yearLogs.length;
-
-                        return avgEmission.toFixed(2);
-                      },
-                    ],
-                  },
-                },
-              ],
-              admin: {
-                width: "50%",
-                style: {
-                  border: "none",
-                  background: "#1a1a1a",
-                  paddingTop: "12.5px",
-                  paddingBottom: "12.5px",
-                },
-              },
-            },
-
-            {
-              name: "total_emission",
-              label: "Total Emission",
-              type: "group",
-              fields: [
-                {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "today",
-                      type: "number",
-                      admin: {
-                        width: "50%",
-                      },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const today = new Date()
-                              .toISOString()
-                              .split("T")[0];
-                            const todayLogs = logs.filter(
-                              (log) => log.timestamp.split("T")[0] === today
-                            );
-                            const totalEmission = todayLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-
-                            return totalEmission.toFixed(2);
-                          },
-                        ],
-                      },
-                    },
-                    {
-                      name: "month",
-                      type: "number",
-                      admin: {
-                        width: "50%",
-                      },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const month = new Date().getMonth() + 1;
-                            const monthLogs = logs.filter(
-                              (log) =>
-                                log.timestamp.split("-")[1] === String(month)
-                            );
-                            const totalEmission = monthLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-
-                            return totalEmission.toFixed(2);
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                },
-                {
-                  name: "year",
-                  type: "number",
-                  hooks: {
-                    beforeValidate: [
-                      (args) => {
-                        const { originalDoc } = args;
-                        const logs: { timestamp: string; emission: number }[] =
-                          originalDoc.logs;
-
-                        const year = new Date().getFullYear();
-                        const yearLogs = logs.filter(
-                          (log) => log.timestamp.split("-")[0] === String(year)
-                        );
-                        const totalEmission = yearLogs.reduce(
-                          (total, log) => total + log.emission,
-                          0
-                        );
-
-                        return totalEmission.toFixed(2);
-                      },
-                    ],
-                  },
-                },
-              ],
-              admin: {
-                width: "50%",
-                style: {
-                  border: "none",
-                  background: "#1a1a1a",
-                  paddingTop: "12.5px",
-                  paddingBottom: "12.5px",
-                },
-              },
-            },
-          ],
-        },
-      ],
-    },
-
-    {
       name: "logs",
       type: "array",
       admin: {
@@ -340,6 +109,252 @@ const Footprint: CollectionConfig = {
               },
             ],
           },
+        },
+      ],
+    },
+
+    {
+      name: "emission_stats",
+      label: "Emission Stats",
+      type: "group",
+      fields: [
+        {
+          type: "row",
+          fields: [
+            {
+              name: "average_emission",
+              label: "Average Emission",
+              type: "group",
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "today",
+                      type: "number",
+                      admin: {
+                        width: "50%",
+                      },
+                      hooks: {
+                        afterRead: [
+                          (args) => {
+                            const { originalDoc } = args;
+                            const logs: {
+                              timestamp: string;
+                              emission: number;
+                            }[] = originalDoc.logs;
+
+                            const today = new Date()
+                              .toISOString()
+                              .split("T")[0];
+                            const todayLogs = logs.filter(
+                              (log) => log.timestamp.split("T")[0] === today
+                            );
+
+                            if (todayLogs.length === 0) {
+                              return 0;
+                            }
+
+                            const totalEmission = todayLogs.reduce(
+                              (total, log) => total + log.emission,
+                              0
+                            );
+                            const avgEmission =
+                              totalEmission / todayLogs.length;
+
+                            return Number(avgEmission.toFixed(2));
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      name: "month",
+                      type: "number",
+                      admin: {
+                        width: "50%",
+                      },
+                      hooks: {
+                        afterRead: [
+                          (args) => {
+                            const { originalDoc } = args;
+                            const logs: {
+                              timestamp: string;
+                              emission: number;
+                            }[] = originalDoc.logs;
+
+                            const month = new Date().getMonth() + 1;
+                            const monthLogs = logs.filter(
+                              (log) =>
+                                log.timestamp.split("-")[1] === String(month)
+                            );
+
+                            if (monthLogs.length === 0) {
+                              return 0;
+                            }
+
+                            const totalEmission = monthLogs.reduce(
+                              (total, log) => total + log.emission,
+                              0
+                            );
+                            const avgEmission =
+                              totalEmission / monthLogs.length;
+
+                            return Number(avgEmission.toFixed(2));
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: "year",
+                  type: "number",
+                  hooks: {
+                    afterRead: [
+                      (args) => {
+                        const { originalDoc } = args;
+                        const logs: { timestamp: string; emission: number }[] =
+                          originalDoc.logs;
+
+                        const year = new Date().getFullYear();
+                        const yearLogs = logs.filter(
+                          (log) => log.timestamp.split("-")[0] === String(year)
+                        );
+
+                        if (yearLogs.length === 0) {
+                          return 0;
+                        }
+
+                        const totalEmission = yearLogs.reduce(
+                          (total, log) => total + log.emission,
+                          0
+                        );
+                        const avgEmission = totalEmission / yearLogs.length;
+
+                        return Number(avgEmission.toFixed(2));
+                      },
+                    ],
+                  },
+                },
+              ],
+              admin: {
+                width: "50%",
+                style: {
+                  border: "none",
+                  background: "#1a1a1a",
+                  paddingTop: "12.5px",
+                  paddingBottom: "12.5px",
+                },
+              },
+            },
+
+            {
+              name: "total_emission",
+              label: "Total Emission",
+              type: "group",
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "today",
+                      type: "number",
+                      admin: {
+                        width: "50%",
+                      },
+                      hooks: {
+                        afterRead: [
+                          (args) => {
+                            const { originalDoc } = args;
+                            const logs: {
+                              timestamp: string;
+                              emission: number;
+                            }[] = originalDoc.logs;
+
+                            const today = new Date()
+                              .toISOString()
+                              .split("T")[0];
+                            const todayLogs = logs.filter(
+                              (log) => log.timestamp.split("T")[0] === today
+                            );
+                            const totalEmission = todayLogs.reduce(
+                              (total, log) => total + log.emission,
+                              0
+                            );
+
+                            return Number(totalEmission.toFixed(2));
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      name: "month",
+                      type: "number",
+                      admin: {
+                        width: "50%",
+                      },
+                      hooks: {
+                        afterRead: [
+                          (args) => {
+                            const { originalDoc } = args;
+                            const logs: {
+                              timestamp: string;
+                              emission: number;
+                            }[] = originalDoc.logs;
+
+                            const month = new Date().getMonth() + 1;
+                            const monthLogs = logs.filter(
+                              (log) =>
+                                log.timestamp.split("-")[1] === String(month)
+                            );
+                            const totalEmission = monthLogs.reduce(
+                              (total, log) => total + log.emission,
+                              0
+                            );
+
+                            return Number(totalEmission.toFixed(2));
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: "year",
+                  type: "number",
+                  hooks: {
+                    afterRead: [
+                      (args) => {
+                        const { originalDoc } = args;
+                        const logs: { timestamp: string; emission: number }[] =
+                          originalDoc.logs;
+
+                        const year = new Date().getFullYear();
+                        const yearLogs = logs.filter(
+                          (log) => log.timestamp.split("-")[0] === String(year)
+                        );
+                        const totalEmission = yearLogs.reduce(
+                          (total, log) => total + log.emission,
+                          0
+                        );
+
+                        return Number(totalEmission.toFixed(2));
+                      },
+                    ],
+                  },
+                },
+              ],
+              admin: {
+                width: "50%",
+                style: {
+                  border: "none",
+                  background: "#1a1a1a",
+                  paddingTop: "12.5px",
+                  paddingBottom: "12.5px",
+                },
+              },
+            },
+          ],
         },
       ],
     },
