@@ -9,8 +9,9 @@ import {
   AccordionItem,
   Card,
   CardHeader,
+  Tooltip,
 } from "@nextui-org/react";
-import { Plus } from "lucide-react";
+import { GraduationCap, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -24,20 +25,29 @@ export function Page() {
   const userDetails = user && user.user;
 
   useEffect(() => {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
     const getTodayLogs = async () => {
-      const res = await fetch(
-        process.env.NEXT_PUBLIC_API + "/api/today?uid=" + userDetails.id,
-        { method: "get", cache: "no-store" },
-      );
+      const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/today", {
+        method: "get",
+        cache: "no-store",
+        headers: headers,
+      });
       const data: TodayLogsProps = await res.json();
       setTodayLogs(data);
       setLoading(false);
     };
 
     if (user) {
+      headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getTodayLogs();
     }
   }, [user]);
+
+  if (todayLogs.message === "You must be logged in") {
+    router.push("/login");
+  }
 
   const todaysLogsSort =
     !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
@@ -45,9 +55,25 @@ export function Page() {
   return (
     <main className="mx-auto max-w-7xl p-5 pt-10">
       <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">
-        <h1 className="text-5xl grow">
-          Hello {userDetails && userDetails.name}
-        </h1>
+        <div className="flex sm:items-center gap-2 max-sm:flex-col grow">
+          <h1 className="text-5xl grow">
+            Hello {!loading && todayLogs && todayLogs.user.name}
+          </h1>
+          {!loading && todayLogs && todayLogs.user.is_class_teacher && (
+            <Tooltip content="Teacher">
+              <Button
+                as={Link}
+                href={"/account/" + todayLogs.user.my_class?.id}
+                variant="light"
+                color="success"
+                className="w-max"
+              >
+                <GraduationCap />
+                Go to your class
+              </Button>
+            </Tooltip>
+          )}
+        </div>
 
         <Button
           as={Link}

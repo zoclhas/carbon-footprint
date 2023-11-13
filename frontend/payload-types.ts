@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   name: string;
-  roles?: ("admin" | "user")[] | null;
+  roles?: ("admin" | "user" | "teacher" | "principal")[] | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -110,6 +110,14 @@ export interface UserProps {
 export interface TodayLogsProps {
   emission_stats: EmissionStats;
   logs: Log[];
+  message?: string;
+  user: {
+    is_class_teacher: boolean;
+    is_principal: boolean;
+    name: string;
+    roles: ("admin" | "user" | "teacher" | "principal")[];
+    my_class?: { id: string; class_section: string };
+  };
 }
 
 export interface EmissionStats {
@@ -136,4 +144,34 @@ export interface Log {
   people: number;
   emission: number;
   id: string;
+}
+
+export interface MyClassProps {
+  class_section: string;
+  class_teacher: User;
+  students: User[];
+  student_with_highest_emission: {
+    emission: number;
+    student: User;
+  };
+  emissions_stats: EmissionsStats;
+}
+
+interface EmissionsStats {
+  todays_emission: Emissions;
+  months_emission: Emissions;
+  years_emission: Emissions;
+}
+
+interface Emissions {
+  total: number;
+  avg: number;
+  activties: {
+    car: number;
+    bus: number;
+    metro: number;
+    cycle: number;
+    walk: number;
+    plane: number;
+  };
 }
