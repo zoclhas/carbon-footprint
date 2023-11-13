@@ -251,7 +251,7 @@ export function Page() {
             </Accordion>
           )}
 
-          {!loading && todayLogs.logs.length === 0 && (
+          {!todaysLogsSort && (
             <Card>
               <CardHeader>
                 <h3>
