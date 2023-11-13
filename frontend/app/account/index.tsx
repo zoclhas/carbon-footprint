@@ -22,7 +22,6 @@ export function Page() {
   const [todayLogs, setTodayLogs] = useState<TodayLogsProps>({});
   // @ts-ignore
   const [user]: UserProps[] = useLocalStorage("user", null);
-  const userDetails = user && user.user;
 
   useEffect(() => {
     const headers = new Headers();

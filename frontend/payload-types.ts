@@ -155,6 +155,7 @@ export interface MyClassProps {
     student: User;
   };
   emissions_stats: EmissionsStats;
+  message?: string;
 }
 
 interface EmissionsStats {
