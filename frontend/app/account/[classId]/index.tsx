@@ -1,7 +1,7 @@
 "use client";
 
 import useLocalStorage from "@/lib/use-local-store";
-import { UserProps, MyClassProps } from "@/payload-types";
+import { UserProps, MyClassProps, Activites } from "@/payload-types";
 import {
   Chip,
   Divider,
@@ -25,7 +25,7 @@ import { Eye, PieChart, Users2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
-const colors = {
+export const colors = {
   green: {
     default: "rgba(23, 201, 100, 1)",
     half: "rgba(23, 201, 100, 0.5)",
@@ -60,7 +60,7 @@ export function MyClass({
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
 
-  function createChart(canvasRef: any, data: { [k: string]: number }) {
+  function createChart(canvasRef: any, data: Activites) {
     const ctx = canvasRef.current?.getContext("2d");
 
     if (ctx && Object.keys(data).length > 0) {

@@ -110,6 +110,11 @@ export interface UserProps {
 export interface TodayLogsProps {
   emission_stats: EmissionStats;
   logs: Log[];
+  activities: {
+    today: Activites;
+    month: Activites;
+    year: Activites;
+  };
   message?: string;
   user: {
     is_class_teacher: boolean;
@@ -167,12 +172,14 @@ interface EmissionsStats {
 interface Emissions {
   total: number;
   avg: number;
-  activties: {
-    car: number;
-    bus: number;
-    metro: number;
-    cycle: number;
-    walk: number;
-    plane: number;
-  };
+  activties: Activites;
+}
+
+export interface Activites {
+  car: number;
+  bus: number;
+  metro: number;
+  cycle: number;
+  walk: number;
+  plane: number;
 }
