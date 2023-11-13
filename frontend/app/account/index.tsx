@@ -63,7 +63,7 @@ export function Page() {
 
       <section className="mt-6">
         <div className="flex gap-2 justify-between max-sm:flex-col sm:items-center mb-3">
-          <h1 className="font-semibold text-3xl">Today&nbsp;s Logs</h1>
+          <h1 className="font-semibold text-3xl">Today&apos;s Logs</h1>
 
           <div className="flex sm:gap-2 sm:items-center max-sm:flex-col">
             {!loading && (

@@ -56,9 +56,7 @@ export const Form = ({ token }: { token: string }) => {
           router.push("/login/reset?message=Error+resetting+your+password");
         }
       }
-      console.log(res);
       const sent: { message: string } = await res.json();
-      console.log(sent);
 
       if (sent.message === "Password reset successfully.") {
         router.push(
@@ -71,7 +69,6 @@ export const Form = ({ token }: { token: string }) => {
   };
 
   if (Object.keys(user).length > 1) {
-    console.log("p");
     router.push("/account");
   }
 
