@@ -338,26 +338,45 @@ export default buildConfig({
           }
 
           const uid = user.id;
+          const roles = user.roles;
 
-          const classData = await payload.find({
-            collection: "classes",
+          let classData;
+          if (roles.includes("principal") || roles.includes("admin")) {
+            classData = await payload.find({
+              collection: "classes",
 
-            where: {
-              and: [
-                {
-                  id: {
-                    equals: class_id,
+              where: {
+                and: [
+                  {
+                    id: {
+                      equals: class_id,
+                    },
                   },
-                },
-                {
-                  "class_teacher.id": {
-                    equals: uid,
+                ],
+              },
+              depth: 3,
+            });
+          } else {
+            classData = await payload.find({
+              collection: "classes",
+
+              where: {
+                and: [
+                  {
+                    id: {
+                      equals: class_id,
+                    },
                   },
-                },
-              ],
-            },
-            depth: 3,
-          });
+                  {
+                    "class_teacher.id": {
+                      equals: uid,
+                    },
+                  },
+                ],
+              },
+              depth: 3,
+            });
+          }
 
           if (classData.totalDocs === 0) {
             res
