@@ -35,16 +35,16 @@ export default buildConfig({
       path: "/today",
       method: "get",
       handler: async (req, res, next) => {
-        const user: User = req.user;
-
-        if (!user) {
-          res.status(403).json({ message: "You must be logged in" });
-          return;
-        }
-
-        const uid = user.id;
-
         try {
+          const user: User = req.user;
+
+          if (!user) {
+            res.status(403).json({ message: "You must be logged in" });
+            return;
+          }
+
+          const uid = user.id;
+
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
 
@@ -71,11 +71,43 @@ export default buildConfig({
             return;
           }
 
+          const date = new Date();
           const logs = data.docs[0].logs;
           const todayLogs = logs.filter((log) => {
             const timestamp = new Date(log.timestamp);
             return timestamp >= todayStart && timestamp <= todayEnd;
           });
+
+          const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
+          const todaysActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const monthsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const yearsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+
+          todayLogs.forEach(
+            (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+          );
+
+          const month = date.getMonth() + 1;
+          const monthLogs = logs.filter(
+            (log) => log.timestamp.split("-")[1] === String(month)
+          );
+          monthLogs.forEach(
+            (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+          );
+
+          const year = date.getFullYear();
+          const yearLogs = logs.filter(
+            (log) => log.timestamp.split("-")[0] === String(year)
+          );
+          yearLogs.forEach(
+            (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+          );
 
           const roles = user.roles;
 
@@ -98,6 +130,11 @@ export default buildConfig({
               res.status(200).json({
                 emission_stats: data.docs[0].emission_stats,
                 logs: todayLogs,
+                activities: {
+                  today: todaysActivitiesEmission,
+                  month: monthsActivitiesEmission,
+                  year: yearsActivitiesEmission,
+                },
                 user: {
                   is_class_teacher: false,
                   is_principal: false,
@@ -111,6 +148,11 @@ export default buildConfig({
             res.status(200).json({
               emission_stats: data.docs[0].emission_stats,
               logs: todayLogs,
+              activities: {
+                today: todaysActivitiesEmission,
+                month: monthsActivitiesEmission,
+                year: yearsActivitiesEmission,
+              },
               user: {
                 is_class_teacher: true,
                 is_principal: false,
@@ -128,6 +170,11 @@ export default buildConfig({
           res.status(200).json({
             emission_stats: data.docs[0].emission_stats,
             logs: todayLogs,
+            activities: {
+              today: todaysActivitiesEmission,
+              month: monthsActivitiesEmission,
+              year: yearsActivitiesEmission,
+            },
             user: {
               is_class_teacher: false,
               is_principal: false,
@@ -319,7 +366,7 @@ export default buildConfig({
             return;
           }
 
-          let todaysEmission = { total: 0, count: 0 };
+          const todaysEmission = { total: 0, count: 0 };
           const studentEmissions: { emission: number; student: User }[] = [];
           const monthsEmission = { total: 0, count: 0 };
           const yearsEmission = { total: 0, count: 0 };
@@ -446,7 +493,7 @@ export default buildConfig({
           });
         } catch (err) {
           console.error(err);
-          res.status(500).json({ message: "Failed to fetch your class data" });
+          res.status(500).json({ message: "Failed to fetch your class data." });
         }
       },
     },
