@@ -35,7 +35,14 @@ export default buildConfig({
       path: "/today",
       method: "get",
       handler: async (req, res, next) => {
-        const uid = req.query.uid ?? "get_a_life";
+        const user: User = req.user;
+
+        if (!user) {
+          res.status(403).json({ message: "You must be logged in" });
+          return;
+        }
+
+        const uid = user.id;
 
         try {
           const todayStart = new Date();
@@ -70,9 +77,61 @@ export default buildConfig({
             return timestamp >= todayStart && timestamp <= todayEnd;
           });
 
+          const roles = user.roles;
+
+          if (roles.includes("teacher")) {
+            const classData = await payload.find({
+              collection: "classes",
+              where: {
+                and: [
+                  {
+                    "class_teacher.id": {
+                      equals: uid,
+                    },
+                  },
+                ],
+              },
+              depth: 0,
+            });
+
+            if (classData.totalDocs === 0) {
+              res.status(200).json({
+                emission_stats: data.docs[0].emission_stats,
+                logs: todayLogs,
+                user: {
+                  is_class_teacher: false,
+                  user: user.name,
+                  roles: roles,
+                },
+              });
+              return;
+            }
+
+            res.status(200).json({
+              emission_stats: data.docs[0].emission_stats,
+              logs: todayLogs,
+              user: {
+                is_class_teacher: true,
+                name: user.name,
+                roles: roles,
+                my_class: {
+                  id: classData.docs[0].id,
+                  class_section: classData.docs[0].combined_class_section,
+                },
+              },
+            });
+            return;
+          }
+
           res.status(200).json({
             emission_stats: data.docs[0].emission_stats,
             logs: todayLogs,
+            user: {
+              is_class_teacher: false,
+              is_principal: false,
+              name: user.name,
+              roles: roles,
+            },
           });
         } catch (err) {
           console.error(err);
@@ -216,20 +275,31 @@ export default buildConfig({
 
     {
       path: "/my-class",
-      method: "get",
+      method: "post",
       handler: async (req, res, next) => {
         try {
-          const uid = req.user.id ?? null;
-          if (uid === null) {
+          const user: User = req.user;
+          const { classId } = req.body;
+
+          if (!user || !classId) {
             res
               .status(403)
               .json({ message: "You need to be a teacher to access this." });
+            return;
           }
+
+          const uid = user.id;
 
           const classData = await payload.find({
             collection: "classes",
+
             where: {
               and: [
+                {
+                  id: {
+                    equals: classId,
+                  },
+                },
                 {
                   "class_teacher.id": {
                     equals: uid,
@@ -244,6 +314,7 @@ export default buildConfig({
             res
               .status(401)
               .json({ message: "No class found under your account." });
+            return;
           }
 
           let todaysEmission = { total: 0, count: 0 };
