@@ -1,4 +1,4 @@
-import { CollectionConfig } from "payload/types";
+import { CollectionConfig, PayloadRequest } from "payload/types";
 
 import adminsAndUser from "./access/adminsAndUser";
 import { ensureFirstUserIsAdmin } from "./hooks/ensureFirstUserIsAdmin";
@@ -13,7 +13,15 @@ const Users: CollectionConfig = {
   auth: {
     useAPIKey: true,
     forgotPassword: {
-      generateEmailHTML: ({ req, token, user }) => {
+      generateEmailHTML: ({
+        req,
+        token,
+        user,
+      }: {
+        req: PayloadRequest;
+        token: string;
+        user: { name: string };
+      }) => {
         // Use the token provided to allow your user to reset their password
         const resetPasswordURL = `${process.env.FE_URL}/login/reset?token=${token}`;
 
