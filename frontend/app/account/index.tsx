@@ -138,7 +138,7 @@ export function Page() {
   const todaysLogsSort =
     !loading && todayLogs ? [...todayLogs.logs].reverse() : [];
 
-  if (Object.keys(todayLogs).length > 1) {
+  if (todayLogs && Object.keys(todayLogs).length > 1) {
     const [maxTodayKey, maxTodayVal] = Object.entries(
       todayLogs.activities.today,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
