@@ -68,6 +68,14 @@ const Users: CollectionConfig = {
           value: "admin",
         },
         {
+          label: "principal",
+          value: "principal",
+        },
+        {
+          label: "teacher",
+          value: "teacher",
+        },
+        {
           label: "user",
           value: "user",
         },

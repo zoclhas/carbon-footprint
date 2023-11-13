@@ -10,6 +10,7 @@ export interface Config {
   collections: {
     users: User;
     footprint: Footprint;
+    classes: Class;
     media: Media;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -19,7 +20,7 @@ export interface Config {
 export interface User {
   id: string;
   name: string;
-  roles?: ('admin' | 'user')[] | null;
+  roles?: ('admin' | 'principal' | 'teacher' | 'user')[] | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -59,6 +60,17 @@ export interface Footprint {
       year?: number | null;
     };
   };
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Class {
+  id: string;
+  class: string;
+  section: string;
+  level?: ('senior' | 'middle' | 'primary') | null;
+  class_teacher: string | User;
+  students: (string | User)[];
+  combined_class_section?: string | null;
   updatedAt: string;
   createdAt: string;
 }

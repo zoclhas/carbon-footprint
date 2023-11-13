@@ -10,6 +10,8 @@ import payload from "payload";
 import Users from "./collections/Users";
 import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
+import ClassSections from "./collections/Classses";
+import { User } from "./payload-types";
 
 export default buildConfig({
   admin: {
@@ -17,7 +19,7 @@ export default buildConfig({
     bundler: webpackBundler(),
   },
   editor: slateEditor({}),
-  collections: [Users, Footprint, Media],
+  collections: [Users, Footprint, ClassSections, Media],
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),
   },
@@ -80,6 +82,7 @@ export default buildConfig({
         }
       },
     },
+
     {
       path: "/logs",
       method: "get",
@@ -133,7 +136,9 @@ export default buildConfig({
           const currentLogs = footprint.docs[0].logs;
           const newLogs = [...currentLogs, log];
 
-          const today = new Date().toISOString().split("T")[0];
+          const date = new Date();
+
+          const today = date.toISOString().split("T")[0];
           const todayLogs = newLogs.filter(
             (log) => log.timestamp.split("T")[0] === today
           );
@@ -146,7 +151,7 @@ export default buildConfig({
             avgTodaysEmission = 0;
           }
 
-          const month = new Date().getMonth() + 1;
+          const month = date.getMonth() + 1;
           const monthLogs = newLogs.filter(
             (log) => log.timestamp.split("-")[1] === String(month)
           );
@@ -158,7 +163,7 @@ export default buildConfig({
             avgMonthsEmission = 0;
           }
 
-          const year = new Date().getFullYear();
+          const year = date.getFullYear();
           const yearLogs = newLogs.filter(
             (log) => log.timestamp.split("-")[0] === String(year)
           );
@@ -205,6 +210,114 @@ export default buildConfig({
         } catch (err) {
           console.error(err);
           res.status(500).json({ message: "Failed to fetch all logs." });
+        }
+      },
+    },
+
+    {
+      path: "/my-class",
+      method: "get",
+      handler: async (req, res, next) => {
+        try {
+          const uid = req.user.id ?? null;
+          if (uid === null) {
+            res
+              .status(403)
+              .json({ message: "You need to be a teacher to access this." });
+          }
+
+          const classData = await payload.find({
+            collection: "classes",
+            where: {
+              and: [
+                {
+                  "class_teacher.id": {
+                    equals: uid,
+                  },
+                },
+              ],
+            },
+            depth: 3,
+          });
+
+          if (classData.totalDocs === 0) {
+            res
+              .status(401)
+              .json({ message: "No class found under your account." });
+          }
+
+          let todaysEmission = { total: 0, count: 0 };
+          const studentEmissions: { emission: number; student: User }[] = [];
+          const monthsEmission = { total: 0, count: 0 };
+          const yearsEmission = { total: 0, count: 0 };
+
+          // @ts-ignore
+          const students: User[] = classData.docs[0].students;
+          for (const student of students) {
+            const studentData = await payload.find({
+              collection: "footprint",
+              where: {
+                and: [
+                  {
+                    "user.id": {
+                      equals: student.id,
+                    },
+                  },
+                ],
+              },
+            });
+            const studentLogs = studentData.docs[0].logs;
+            const date = new Date();
+
+            const todayStart = new Date(date.setHours(0, 0, 0, 0));
+            const todayEnd = new Date(date.setHours(23, 59, 59, 999));
+            const todayLogs = studentLogs.filter((log) => {
+              const timestamp = new Date(log.timestamp);
+              return timestamp >= todayStart && timestamp <= todayEnd;
+            });
+            const studentTodaysEmission = Number(
+              todayLogs
+                .reduce((total, log) => total + log.emission, 0)
+                .toFixed(2)
+            );
+
+            todaysEmission.total += studentTodaysEmission;
+            todaysEmission.count += todayLogs.length;
+            studentEmissions.push({
+              emission: studentTodaysEmission,
+              student: student,
+            });
+          }
+
+          const studentWithHighestEmission = studentEmissions.reduce(
+            (prev, current) => {
+              return prev.emission > current.emission ? prev : current;
+            }
+          );
+
+          res.status(200).json({
+            class_section: classData.docs[0].combined_class_section,
+            class_teacher: classData.docs[0].class_teacher,
+            students: students,
+            student_with_highest_emission: studentWithHighestEmission,
+            emissions_stats: {
+              todays_emission: {
+                total: todaysEmission.total,
+                avg: +(todaysEmission.total / todaysEmission.count).toFixed(2),
+              },
+              months_emission: {
+                total: monthsEmission.total,
+                avg: +(monthsEmission.total / monthsEmission.count).toFixed(2),
+              },
+              years_emission: {
+                total: yearsEmission.total,
+                avg: +(yearsEmission.total / yearsEmission.count).toFixed(2),
+              },
+            },
+          });
+        } catch (err) {
+          console.error(err);
+          res.status(500).json({ message: "Failed to fetch your class data" });
         }
       },
     },
