@@ -11,6 +11,7 @@ import {
   CardHeader,
 } from "@nextui-org/react";
 import { Plus } from "lucide-react";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function Page() {
@@ -35,7 +36,11 @@ export function Page() {
     if (user) {
       getTodayLogs();
     }
-  }, [user, userDetails.id]);
+  }, [user]);
+
+  if (userDetails === null) {
+    redirect("/login");
+  }
 
   const todaysLogsSort =
     !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
