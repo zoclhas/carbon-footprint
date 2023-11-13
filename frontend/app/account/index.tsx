@@ -11,10 +11,11 @@ import {
   CardHeader,
 } from "@nextui-org/react";
 import { Plus } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function Page() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   //@ts-ignore
   const [todayLogs, setTodayLogs] = useState<TodayLogsProps>({});
@@ -38,9 +39,12 @@ export function Page() {
     }
   }, [user]);
 
-  if (userDetails === null) {
-    redirect("/login");
-  }
+  setTimeout(() => {
+    if (!user) {
+      console.log(user);
+      router.push("/login");
+    }
+  }, 5000);
 
   const todaysLogsSort =
     !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
