@@ -37,6 +37,9 @@ export function Page() {
     }
   }, [user]);
 
+  const todaysLogsSort =
+    !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
+
   return (
     <main className="mx-auto max-w-7xl p-5 pt-10">
       <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">
@@ -65,13 +68,16 @@ export function Page() {
               <>
                 <h2>
                   <strong>Today&apos;s Emission:</strong>{" "}
-                  {todayLogs.emission_stats.total_emission.today ?? 0} kg of CO
+                  {todayLogs.emission_stats.total_emission.today.toFixed(2) ??
+                    0}{" "}
+                  kg of CO
                   <sub>2</sub>
                 </h2>
                 <h2>
                   <strong>Today&apos;s Average Emission:</strong>{" "}
-                  {todayLogs.emission_stats.average_emission.today ?? 0} kg of
-                  CO
+                  {todayLogs.emission_stats.average_emission.today.toFixed(2) ??
+                    0}{" "}
+                  kg of CO
                   <sub>2</sub>
                 </h2>
               </>
@@ -79,26 +85,23 @@ export function Page() {
           </div>
         </div>
 
-        {!loading && todayLogs.logs.length > 0 && (
+        {todaysLogsSort.length > 0 && (
           <Accordion variant="splitted">
-            {todayLogs.logs.map((log) => {
+            {todaysLogsSort.map((log) => {
               const date = new Date(log.timestamp);
-              let hours24 = date.getHours();
-              let hours12 =
-                hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
-              let minutes = date.getMinutes();
-              let seconds = date.getSeconds();
-              let ampm = hours24 < 12 ? "AM" : "PM";
+              const time = date.toLocaleString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true,
+              });
 
               function capitalizeFirstLetter(str: string): string {
                 return str.charAt(0).toUpperCase() + str.slice(1);
               }
 
               return (
-                <AccordionItem
-                  key={log.id}
-                  title={`${hours12}:${minutes}:${seconds} ${ampm}`}
-                >
+                <AccordionItem key={log.id} title={time}>
                   <ul>
                     <li>
                       <strong>Activity:</strong>&nbsp;

@@ -5,6 +5,16 @@ const Footprint: CollectionConfig = {
   slug: "footprint",
   access: {
     read: anyone,
+    update: (args) => {
+      const req = args.req;
+      const user = req.user;
+
+      if (user.roles && user.roles.some((role) => role === "admin")) {
+        return true;
+      }
+
+      return user.id === req.query.uid;
+    },
   },
   admin: {
     defaultColumns: ["user", "logs", "updatedAt"],
@@ -135,37 +145,6 @@ const Footprint: CollectionConfig = {
                       admin: {
                         width: "50%",
                       },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const today = new Date()
-                              .toISOString()
-                              .split("T")[0];
-                            const todayLogs = logs.filter(
-                              (log) => log.timestamp.split("T")[0] === today
-                            );
-
-                            if (todayLogs.length === 0) {
-                              return 0;
-                            }
-
-                            const totalEmission = todayLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-                            const avgEmission =
-                              totalEmission / todayLogs.length;
-
-                            return Number(avgEmission.toFixed(2));
-                          },
-                        ],
-                      },
                     },
                     {
                       name: "month",
@@ -173,68 +152,12 @@ const Footprint: CollectionConfig = {
                       admin: {
                         width: "50%",
                       },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const month = new Date().getMonth() + 1;
-                            const monthLogs = logs.filter(
-                              (log) =>
-                                log.timestamp.split("-")[1] === String(month)
-                            );
-
-                            if (monthLogs.length === 0) {
-                              return 0;
-                            }
-
-                            const totalEmission = monthLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-                            const avgEmission =
-                              totalEmission / monthLogs.length;
-
-                            return Number(avgEmission.toFixed(2));
-                          },
-                        ],
-                      },
                     },
                   ],
                 },
                 {
                   name: "year",
                   type: "number",
-                  hooks: {
-                    beforeValidate: [
-                      (args) => {
-                        const { originalDoc } = args;
-                        const logs: { timestamp: string; emission: number }[] =
-                          originalDoc.logs;
-
-                        const year = new Date().getFullYear();
-                        const yearLogs = logs.filter(
-                          (log) => log.timestamp.split("-")[0] === String(year)
-                        );
-
-                        if (yearLogs.length === 0) {
-                          return 0;
-                        }
-
-                        const totalEmission = yearLogs.reduce(
-                          (total, log) => total + log.emission,
-                          0
-                        );
-                        const avgEmission = totalEmission / yearLogs.length;
-
-                        return Number(avgEmission.toFixed(2));
-                      },
-                    ],
-                  },
                 },
               ],
               admin: {
@@ -262,30 +185,6 @@ const Footprint: CollectionConfig = {
                       admin: {
                         width: "50%",
                       },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const today = new Date()
-                              .toISOString()
-                              .split("T")[0];
-                            const todayLogs = logs.filter(
-                              (log) => log.timestamp.split("T")[0] === today
-                            );
-                            const totalEmission = todayLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-
-                            return Number(totalEmission.toFixed(2));
-                          },
-                        ],
-                      },
                     },
                     {
                       name: "month",
@@ -293,55 +192,12 @@ const Footprint: CollectionConfig = {
                       admin: {
                         width: "50%",
                       },
-                      hooks: {
-                        beforeValidate: [
-                          (args) => {
-                            const { originalDoc } = args;
-                            const logs: {
-                              timestamp: string;
-                              emission: number;
-                            }[] = originalDoc.logs;
-
-                            const month = new Date().getMonth() + 1;
-                            const monthLogs = logs.filter(
-                              (log) =>
-                                log.timestamp.split("-")[1] === String(month)
-                            );
-                            const totalEmission = monthLogs.reduce(
-                              (total, log) => total + log.emission,
-                              0
-                            );
-
-                            return Number(totalEmission.toFixed(2));
-                          },
-                        ],
-                      },
                     },
                   ],
                 },
                 {
                   name: "year",
                   type: "number",
-                  hooks: {
-                    beforeValidate: [
-                      (args) => {
-                        const { originalDoc } = args;
-                        const logs: { timestamp: string; emission: number }[] =
-                          originalDoc.logs;
-
-                        const year = new Date().getFullYear();
-                        const yearLogs = logs.filter(
-                          (log) => log.timestamp.split("-")[0] === String(year)
-                        );
-                        const totalEmission = yearLogs.reduce(
-                          (total, log) => total + log.emission,
-                          0
-                        );
-
-                        return Number(totalEmission.toFixed(2));
-                      },
-                    ],
-                  },
                 },
               ],
               admin: {

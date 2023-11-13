@@ -48,6 +48,7 @@ export const Form = () => {
 
   if (Object.keys(user).length > 1) {
     router.push("/account");
+    location.reload();
   }
 
   return (
