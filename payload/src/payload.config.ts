@@ -100,6 +100,7 @@ export default buildConfig({
                 logs: todayLogs,
                 user: {
                   is_class_teacher: false,
+                  is_principal: false,
                   user: user.name,
                   roles: roles,
                 },
@@ -112,6 +113,7 @@ export default buildConfig({
               logs: todayLogs,
               user: {
                 is_class_teacher: true,
+                is_principal: false,
                 name: user.name,
                 roles: roles,
                 my_class: {
@@ -279,9 +281,9 @@ export default buildConfig({
       handler: async (req, res, next) => {
         try {
           const user: User = req.user;
-          const { classId } = req.body;
+          const { class_id } = req.body;
 
-          if (!user || !classId) {
+          if (!user || !class_id) {
             res
               .status(403)
               .json({ message: "You need to be a teacher to access this." });
@@ -297,7 +299,7 @@ export default buildConfig({
               and: [
                 {
                   id: {
-                    equals: classId,
+                    equals: class_id,
                   },
                 },
                 {
