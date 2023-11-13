@@ -300,104 +300,119 @@ export function MyClass({
               </CardHeader>
             </Card>
 
-            <Card className="mt-8">
-              <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                <h3 className="max-md:w-full font-semibold">Today</h3>
-                <div className="flex max-md:flex-col sm:gap-4 text-base">
-                  <h3>
-                    <strong>Today&apos;s Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.todays_emission.total} kg of
-                      CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                  <h3>
-                    <strong>Today&apos;s Avg Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.todays_emission.avg} kg of
-                      CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <canvas id="today-graph" ref={todayChartCanvas}></canvas>
-              </CardBody>
-              <CardFooter>
-                <h4 className="text-base">
-                  <strong>Highest emission: </strong>
-                  {capitalizeFirstLetter(maxTodayKey)} produced {maxTodayVal}
-                  kg of CO<sub>2</sub>
-                </h4>
-              </CardFooter>
-            </Card>
-            <Card className="mt-4">
-              <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                <h3 className="max-md:w-full font-semibold">Month</h3>
-                <div className="flex max-md:flex-col sm:gap-4 text-base">
-                  <h3>
-                    <strong>Month&apos;s Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.months_emission.total} kg of
-                      CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                  <h3>
-                    <strong>Month&apos;s Avg Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.months_emission.avg} kg of
-                      CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <canvas id="month-graph" ref={monthChartCanvas}></canvas>
-              </CardBody>
-              <CardFooter>
-                <h4 className="text-base">
-                  <strong>Highest emission: </strong>
-                  {capitalizeFirstLetter(maxMonthKey)} produced {maxMonthVal}
-                  kg of CO<sub>2</sub>
-                </h4>
-              </CardFooter>
-            </Card>
-            <Card className="mt-4">
-              <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                <h3 className="max-md:w-full font-semibold">Year</h3>
-                <div className="flex max-md:flex-col sm:gap-4 text-base">
-                  <h3>
-                    <strong>Year&apos;s Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.years_emission.total} kg of
-                      CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                  <h3>
-                    <strong>Year&apos;s Avg Emission: </strong>
-                    <span className="justify-self-start">
-                      {classDetails.emissions_stats.years_emission.avg} kg of CO
-                      <sub>2</sub>
-                    </span>
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <canvas id="year-graph" ref={yearChartCanvas}></canvas>
-              </CardBody>
-              <CardFooter>
-                <h4 className="text-base">
-                  <strong>Highest emission: </strong>
-                  {capitalizeFirstLetter(maxYearKey)} produced {maxYearVal}
-                  kg of CO<sub>2</sub>
-                </h4>
-              </CardFooter>
-            </Card>
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full mt-8">
+              <Card className="lg:col-span-2">
+                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
+                  <h3 className="max-md:w-full font-semibold">Today</h3>
+                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                    <h3>
+                      <strong>Today&apos;s Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.todays_emission.total} kg
+                        of CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                    <h3>
+                      <strong>Today&apos;s Avg Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.todays_emission.avg} kg of
+                        CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <canvas
+                    id="today-graph"
+                    ref={todayChartCanvas}
+                    height={398}
+                  ></canvas>
+                </CardBody>
+                <CardFooter>
+                  <h4 className="text-base">
+                    <strong>Highest emission: </strong>
+                    {capitalizeFirstLetter(maxTodayKey)} produced {maxTodayVal}
+                    kg of CO<sub>2</sub>
+                  </h4>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
+                  <h3 className="max-md:w-full font-semibold">Month</h3>
+                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                    <h3>
+                      <strong>Month&apos;s Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.months_emission.total} kg
+                        of CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                    <h3>
+                      <strong>Month&apos;s Avg Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.months_emission.avg} kg of
+                        CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <canvas
+                    id="month-graph"
+                    ref={monthChartCanvas}
+                    height={398}
+                  ></canvas>
+                </CardBody>
+                <CardFooter>
+                  <h4 className="text-base">
+                    <strong>Highest emission: </strong>
+                    {capitalizeFirstLetter(maxMonthKey)} produced {maxMonthVal}
+                    kg of CO<sub>2</sub>
+                  </h4>
+                </CardFooter>
+              </Card>
+              <Card className="lg:col-span-3 md:col-span-2">
+                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
+                  <h3 className="max-md:w-full font-semibold">Year</h3>
+                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                    <h3>
+                      <strong>Year&apos;s Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.years_emission.total} kg
+                        of CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                    <h3>
+                      <strong>Year&apos;s Avg Emission: </strong>
+                      <span className="justify-self-start">
+                        {classDetails.emissions_stats.years_emission.avg} kg of
+                        CO
+                        <sub>2</sub>
+                      </span>
+                    </h3>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <canvas
+                    id="year-graph"
+                    ref={yearChartCanvas}
+                    height={398}
+                  ></canvas>
+                </CardBody>
+                <CardFooter>
+                  <h4 className="text-base">
+                    <strong>Highest emission: </strong>
+                    {capitalizeFirstLetter(maxYearKey)} produced {maxYearVal}
+                    kg of CO<sub>2</sub>
+                  </h4>
+                </CardFooter>
+              </Card>
+            </div>
           </section>
         )}
       </main>

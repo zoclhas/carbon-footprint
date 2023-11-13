@@ -51,6 +51,8 @@ export function Page() {
   const todaysLogsSort =
     !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
 
+  console.log(todayLogs.emission_stats);
+
   return (
     <main className="mx-auto max-w-7xl p-5 pt-10">
       <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">

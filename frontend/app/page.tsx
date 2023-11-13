@@ -92,10 +92,10 @@ const more = [
   },
   {
     q: "What does CarbTrkr do?",
-    a: "CarbTrkr is a tool designed to track your carbon footprint at the moment. All your logs are added at the exact time you log it and you can't edit it later, meaning you're really leaving a footprint behind! We then compile your stats and give you recommendation on lowering your carbon footprint.",
+    a: "CarbTrkr is a tool designed to track your carbon footprint at the moment. All your logs are added at the exact time you log it and you can't edit it later, meaning you're really leaving a footprint behind! We then compile your stats and give you recommendation on lowering your carbon footprint. The logs are then viewable by your class teacher and principal! So try to lower you carbon footprint!",
   },
   {
     q: "How can I get started?",
-    a: "Start by creating your account, then it will automatically redirect you to your account page. You can start adding logs there.",
+    a: "Start by creating your account, then it will automatically redirect you to your account page. You can start adding logs there. And your school may add you to their list!",
   },
 ];
