@@ -170,6 +170,19 @@ export default buildConfig({
             avgYearsEmission = 0;
           }
 
+          const emission_stats = {
+            average_emission: {
+              today: Number(avgTodaysEmission.toFixed(2)),
+              month: Number(avgMonthsEmission.toFixed(2)),
+              year: Number(avgYearsEmission.toFixed(2)),
+            },
+            total_emission: {
+              today: Number(todaysEmission.toFixed(2)),
+              month: Number(monthsEmission.toFixed(2)),
+              year: Number(yearsEmission.toFixed(2)),
+            },
+          };
+
           const updatedFootprint = await payload.update({
             collection: "footprint",
             user: req.user,
@@ -184,18 +197,7 @@ export default buildConfig({
             },
             data: {
               logs: newLogs,
-              emission_stats: {
-                average_emission: {
-                  today: avgTodaysEmission,
-                  month: avgMonthsEmission,
-                  year: avgYearsEmission,
-                },
-                total_emission: {
-                  today: todaysEmission,
-                  month: monthsEmission,
-                  year: yearsEmission,
-                },
-              },
+              emission_stats: emission_stats,
             },
           });
 

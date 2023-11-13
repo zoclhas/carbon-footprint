@@ -39,13 +39,6 @@ export function Page() {
     }
   }, [user]);
 
-  setTimeout(() => {
-    if (!user) {
-      console.log(user);
-      router.push("/login");
-    }
-  }, 5000);
-
   const todaysLogsSort =
     !loading && todayLogs.logs.length > 0 ? [...todayLogs.logs].reverse() : [];
 
@@ -77,16 +70,13 @@ export function Page() {
               <>
                 <h2>
                   <strong>Today&apos;s Emission:</strong>{" "}
-                  {todayLogs.emission_stats.total_emission.today.toFixed(2) ??
-                    0}{" "}
-                  kg of CO
+                  {todayLogs.emission_stats.total_emission.today ?? 0} kg of CO
                   <sub>2</sub>
                 </h2>
                 <h2>
                   <strong>Today&apos;s Average Emission:</strong>{" "}
-                  {todayLogs.emission_stats.average_emission.today.toFixed(2) ??
-                    0}{" "}
-                  kg of CO
+                  {todayLogs.emission_stats.average_emission.today ?? 0} kg of
+                  CO
                   <sub>2</sub>
                 </h2>
               </>
