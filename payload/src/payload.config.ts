@@ -251,6 +251,17 @@ export default buildConfig({
           const monthsEmission = { total: 0, count: 0 };
           const yearsEmission = { total: 0, count: 0 };
 
+          const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
+          const todaysActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const monthsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const yearsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+
           // @ts-ignore
           const students: User[] = classData.docs[0].students;
           for (const student of students) {
@@ -280,6 +291,35 @@ export default buildConfig({
                 .reduce((total, log) => total + log.emission, 0)
                 .toFixed(2)
             );
+            todayLogs.forEach(
+              (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+            );
+
+            const month = date.getMonth() + 1;
+            const monthLogs = studentLogs.filter(
+              (log) => log.timestamp.split("-")[1] === String(month)
+            );
+            const studentMonthsEmission = Number(
+              monthLogs
+                .reduce((total, log) => total + log.emission, 0)
+                .toFixed(2)
+            );
+            monthLogs.forEach(
+              (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+            );
+
+            const year = date.getFullYear();
+            const yearLogs = studentLogs.filter(
+              (log) => log.timestamp.split("-")[0] === String(year)
+            );
+            const studentYearsEmission = Number(
+              yearLogs
+                .reduce((total, log) => total + log.emission, 0)
+                .toFixed(2)
+            );
+            yearLogs.forEach(
+              (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+            );
 
             todaysEmission.total += studentTodaysEmission;
             todaysEmission.count += todayLogs.length;
@@ -287,6 +327,10 @@ export default buildConfig({
               emission: studentTodaysEmission,
               student: student,
             });
+            monthsEmission.total += studentMonthsEmission;
+            monthsEmission.count += monthLogs.length;
+            yearsEmission.total += studentYearsEmission;
+            yearsEmission.count += yearLogs.length;
           }
 
           const studentWithHighestEmission = studentEmissions.reduce(
@@ -303,15 +347,27 @@ export default buildConfig({
             emissions_stats: {
               todays_emission: {
                 total: todaysEmission.total,
-                avg: +(todaysEmission.total / todaysEmission.count).toFixed(2),
+                avg:
+                  todaysEmission.count !== 0
+                    ? +(todaysEmission.total / todaysEmission.count).toFixed(2)
+                    : 0,
+                activties: todaysActivitiesEmission,
               },
               months_emission: {
                 total: monthsEmission.total,
-                avg: +(monthsEmission.total / monthsEmission.count).toFixed(2),
+                avg:
+                  monthsEmission.count !== 0
+                    ? +(monthsEmission.total / monthsEmission.count).toFixed(2)
+                    : 0,
+                activties: monthsActivitiesEmission,
               },
               years_emission: {
                 total: yearsEmission.total,
-                avg: +(yearsEmission.total / yearsEmission.count).toFixed(2),
+                avg:
+                  yearsEmission.count !== 0
+                    ? +(yearsEmission.total / yearsEmission.count).toFixed(2)
+                    : 0,
+                activties: yearsActivitiesEmission,
               },
             },
           });
