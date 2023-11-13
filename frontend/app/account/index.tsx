@@ -251,7 +251,7 @@ export function Page() {
             </Accordion>
           )}
 
-          {!todaysLogsSort && (
+          {todaysLogsSort.length === 0 && (
             <Card>
               <CardHeader>
                 <h3>
@@ -270,7 +270,7 @@ export function Page() {
           )}
         </section>
 
-        {todaysLogsSort && (
+        {todaysLogsSort && todaysLogsSort.length > 0 && (
           <section className="mt-6">
             <h1 className="font-semibold text-3xl">Stats</h1>
 
