@@ -78,6 +78,12 @@ export default buildConfig({
             return timestamp >= todayStart && timestamp <= todayEnd;
           });
 
+          let emission_stats = data.docs[0].emission_stats;
+          if (todayLogs.length === 0) {
+            emission_stats.total_emission.today = 0;
+            emission_stats.average_emission.today = 0;
+          }
+
           const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
           const todaysActivitiesEmission = Object.fromEntries(
             activities.map((activity) => [activity, 0])
@@ -128,7 +134,7 @@ export default buildConfig({
 
             if (classData.totalDocs === 0) {
               res.status(200).json({
-                emission_stats: data.docs[0].emission_stats,
+                emission_stats: emission_stats,
                 logs: todayLogs,
                 activities: {
                   today: todaysActivitiesEmission,
@@ -146,7 +152,7 @@ export default buildConfig({
             }
 
             res.status(200).json({
-              emission_stats: data.docs[0].emission_stats,
+              emission_stats: emission_stats,
               logs: todayLogs,
               activities: {
                 today: todaysActivitiesEmission,
@@ -168,7 +174,7 @@ export default buildConfig({
           }
 
           res.status(200).json({
-            emission_stats: data.docs[0].emission_stats,
+            emission_stats: emission_stats,
             logs: todayLogs,
             activities: {
               today: todaysActivitiesEmission,
