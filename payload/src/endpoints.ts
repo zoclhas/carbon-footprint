@@ -3,7 +3,7 @@ import path from "path";
 import payload from "payload";
 import { User } from "payload/generated-types";
 
-export const Endpoints: Endpoint[] = [
+export const endpoints: Endpoint[] = [
   {
     path: "/today",
     method: "get",

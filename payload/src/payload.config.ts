@@ -12,7 +12,7 @@ import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
 import ClassSections from "./collections/Classses";
 import { User } from "./payload-types";
-import { Endpoints } from "./endpoints";
+import { endpoints } from "./endpoints";
 
 export default buildConfig({
   admin: {
@@ -31,5 +31,5 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI,
   }),
-  endpoints: Endpoints,
+  endpoints,
 });
