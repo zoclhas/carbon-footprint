@@ -4,9 +4,11 @@ import {
   NavbarContent,
   NavbarItem,
   Link,
+  Button,
 } from "@nextui-org/react";
 import { Login } from "./login";
 import { ThemeSwitcher } from "./theme-switch";
+import { MessageButton } from "./message";
 
 export const Navbar = () => {
   return (
@@ -20,6 +22,7 @@ export const Navbar = () => {
       <NavbarContent></NavbarContent>
 
       <NavbarContent className="w-max !justify-end">
+        <MessageButton />
         <NavbarItem>
           <ThemeSwitcher />
         </NavbarItem>

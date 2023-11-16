@@ -120,6 +120,7 @@ export interface TodayLogsProps {
     is_class_teacher: boolean;
     is_principal: boolean;
     name: string;
+    user: string;
     roles: ("admin" | "user" | "teacher" | "principal")[];
     my_class?: { id: string; class_section: string };
   };
@@ -197,4 +198,13 @@ export interface ClassStudent {
     name: string;
     class: string;
   };
+}
+
+export interface Message {
+  read: MessageProps;
+  unread: MessageProps;
+}
+
+interface MessageProps {
+  totalDocs: number;
 }

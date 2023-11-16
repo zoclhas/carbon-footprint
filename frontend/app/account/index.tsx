@@ -164,9 +164,9 @@ export function Page() {
         <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">
           <div className="flex sm:items-center gap-2 max-sm:flex-col grow">
             <h1 className="text-5xl grow">
-              Hello {!loading && todayLogs && todayLogs.user.name}
+              Hello {todayLogs.user.user || todayLogs.user.name}
             </h1>
-            {!loading && todayLogs && todayLogs.user.is_class_teacher && (
+            {todayLogs.user.is_class_teacher && (
               <Tooltip content="Teacher">
                 <Button
                   as={Link}
