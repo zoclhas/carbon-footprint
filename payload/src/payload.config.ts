@@ -5,14 +5,13 @@ import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { webpackBundler } from "@payloadcms/bundler-webpack";
 import { slateEditor } from "@payloadcms/richtext-slate";
 import { buildConfig } from "payload/config";
-import payload from "payload";
 
 import Users from "./collections/Users";
 import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
 import ClassSections from "./collections/Classses";
-import { User } from "./payload-types";
 import { endpoints } from "./endpoints";
+import Messages from "./collections/Messages";
 
 export default buildConfig({
   admin: {
@@ -20,7 +19,7 @@ export default buildConfig({
     bundler: webpackBundler(),
   },
   editor: slateEditor({}),
-  collections: [Users, Footprint, ClassSections, Media],
+  collections: [Users, Footprint, ClassSections, Messages, Media],
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),
   },
