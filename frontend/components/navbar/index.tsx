@@ -6,6 +6,7 @@ import {
   Link,
 } from "@nextui-org/react";
 import { Login } from "./login";
+import { ThemeSwitcher } from "./theme-switch";
 
 export const Navbar = () => {
   return (
@@ -16,7 +17,14 @@ export const Navbar = () => {
         </Link>
       </NavbarBrand>
 
-      <Login />
+      <NavbarContent></NavbarContent>
+
+      <NavbarContent className="w-max !justify-end">
+        <NavbarItem>
+          <ThemeSwitcher />
+        </NavbarItem>
+        <Login />
+      </NavbarContent>
     </NextUINavbar>
   );
 };
