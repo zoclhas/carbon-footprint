@@ -111,9 +111,9 @@ export interface TodayLogsProps {
   emission_stats: EmissionStats;
   logs: Log[];
   activities: {
-    today: Activites;
-    month: Activites;
-    year: Activites;
+    today: Activities;
+    month: Activities;
+    year: Activities;
   };
   message?: string;
   user: {
@@ -172,14 +172,29 @@ interface EmissionsStats {
 interface Emissions {
   total: number;
   avg: number;
-  activties: Activites;
+  activties: Activities;
 }
 
-export interface Activites {
+export interface Activities {
   car: number;
   bus: number;
   metro: number;
   cycle: number;
   walk: number;
   plane: number;
+}
+
+export interface ClassStudent {
+  message?: string;
+  emission_stats: EmissionStats;
+  logs: Log[];
+  activities: {
+    today: Activities;
+    month: Activities;
+    year: Activities;
+  };
+  student: {
+    name: string;
+    class: string;
+  };
 }

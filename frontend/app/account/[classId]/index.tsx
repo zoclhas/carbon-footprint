@@ -1,7 +1,7 @@
 "use client";
 
 import useLocalStorage from "@/lib/use-local-store";
-import { UserProps, MyClassProps, Activites } from "@/payload-types";
+import { UserProps, MyClassProps, Activities } from "@/payload-types";
 import {
   Chip,
   Divider,
@@ -60,7 +60,7 @@ export function MyClass({
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
 
-  function createChart(canvasRef: any, data: Activites) {
+  function createChart(canvasRef: any, data: Activities) {
     const ctx = canvasRef.current?.getContext("2d");
 
     if (ctx && Object.keys(data).length > 0) {
@@ -140,14 +140,6 @@ export function MyClass({
         }),
       });
       const data: MyClassProps = await res.json();
-      const errorMessages = [
-        "No class found under your account.",
-        "You need to be a teacher to access this.",
-        "Failed to fetch your class data.",
-      ];
-      if (data.message && errorMessages.includes(data.message)) {
-        return notFound();
-      }
 
       setClassDetails(data);
       setLoading(false);
@@ -166,6 +158,16 @@ export function MyClass({
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
         <Spinner color="success" size="lg" />
+      </main>
+    );
+  }
+
+  if (classDetails.message) {
+    return (
+      <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
+        <Card className="bg-danger-50">
+          <CardHeader>{classDetails.message}</CardHeader>
+        </Card>
       </main>
     );
   }
@@ -332,9 +334,16 @@ export function MyClass({
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
-                    <strong>Highest emission: </strong>
-                    {capitalizeFirstLetter(maxTodayKey)} produced {maxTodayVal}
-                    kg of CO<sub>2</sub>
+                    {maxTodayVal === 0 ? (
+                      <>Add logs to view highest emission</>
+                    ) : (
+                      <>
+                        <strong>Highest emission: </strong>
+                        {capitalizeFirstLetter(maxTodayKey)} produced{" "}
+                        {maxTodayVal}
+                        kg of CO<sub>2</sub>
+                      </>
+                    )}
                   </h4>
                 </CardFooter>
               </Card>
@@ -369,9 +378,16 @@ export function MyClass({
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
-                    <strong>Highest emission: </strong>
-                    {capitalizeFirstLetter(maxMonthKey)} produced {maxMonthVal}
-                    kg of CO<sub>2</sub>
+                    {maxMonthVal === 0 ? (
+                      <>Add logs to view highest emission</>
+                    ) : (
+                      <>
+                        <strong>Highest emission: </strong>
+                        {capitalizeFirstLetter(maxMonthKey)} produced{" "}
+                        {maxMonthVal}
+                        kg of CO<sub>2</sub>
+                      </>
+                    )}
                   </h4>
                 </CardFooter>
               </Card>
@@ -406,9 +422,16 @@ export function MyClass({
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
-                    <strong>Highest emission: </strong>
-                    {capitalizeFirstLetter(maxYearKey)} produced {maxYearVal}
-                    kg of CO<sub>2</sub>
+                    {maxYearVal === 0 ? (
+                      <>Add logs to view highest emission</>
+                    ) : (
+                      <>
+                        <strong>Highest emission: </strong>
+                        {capitalizeFirstLetter(maxYearKey)} produced{" "}
+                        {maxTodayVal}
+                        kg of CO<sub>2</sub>
+                      </>
+                    )}
                   </h4>
                 </CardFooter>
               </Card>

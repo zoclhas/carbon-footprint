@@ -1,30 +1,35 @@
 "use client";
 
 import useLocalStorage from "@/lib/use-local-store";
-import { TodayLogsProps, UserProps, Activities } from "@/payload-types";
+import { UserProps, Activities, ClassStudent } from "@/payload-types";
+import { useState, useRef, useEffect } from "react";
+import Chart from "chart.js/auto";
+import { colors } from "@/app/account/[classId]/index";
 import {
+  Card,
+  CardHeader,
+  Spinner,
   Button,
   Link,
   Accordion,
   AccordionItem,
-  Card,
-  CardHeader,
   Tooltip,
   CardBody,
   CardFooter,
-  Spinner,
+  Chip,
 } from "@nextui-org/react";
 import { GraduationCap, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import Chart from "chart.js/auto";
-import { colors } from "./[classId]";
 
-export function Page() {
-  const router = useRouter();
+export function StudentIdPage({
+  classId,
+  studentId,
+}: {
+  classId: string;
+  studentId: string;
+}) {
   const [loading, setLoading] = useState(true);
   //@ts-ignore
-  const [todayLogs, setTodayLogs] = useState<TodayLogsProps>({});
+  const [student, setStudent] = useState<ClassStudent>({});
   // @ts-ignore
   const [user]: UserProps[] = useLocalStorage("user", null);
 
@@ -32,20 +37,27 @@ export function Page() {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
 
-    const getTodayLogs = async () => {
-      const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/today", {
-        method: "get",
-        cache: "no-store",
-        headers: headers,
-      });
-      const data: TodayLogsProps = await res.json();
-      setTodayLogs(data);
+    const getStudentDetails = async () => {
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API + "/api/my-class/student",
+        {
+          method: "post",
+          cache: "no-store",
+          headers: headers,
+          body: JSON.stringify({
+            class_id: classId,
+            student_id: studentId,
+          }),
+        },
+      );
+      const data: ClassStudent = await res.json();
+      setStudent(data);
       setLoading(false);
     };
 
     if (user) {
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
-      getTodayLogs();
+      getStudentDetails();
     }
   }, [user]);
 
@@ -101,18 +113,18 @@ export function Page() {
     }
   }
   useEffect(() => {
-    if (Object.keys(todayLogs).length > 1) {
+    if (Object.keys(student).length > 1) {
       const todayChartCleanup = createChart(
         todayChartCanvas,
-        todayLogs.activities.today,
+        student.activities.today,
       );
       const monthChartCleanup = createChart(
         monthChartCanvas,
-        todayLogs.activities.month,
+        student.activities.month,
       );
       const yearChartCleanup = createChart(
         yearChartCanvas,
-        todayLogs.activities.year,
+        student.activities.year,
       );
 
       return function cleanup() {
@@ -121,11 +133,7 @@ export function Page() {
         yearChartCleanup && yearChartCleanup();
       };
     }
-  }, [todayLogs]);
-
-  if (todayLogs.message === "You must be logged in") {
-    router.push("/login");
-  }
+  }, [student]);
 
   if (loading) {
     return (
@@ -135,63 +143,38 @@ export function Page() {
     );
   }
 
-  if (todayLogs.message) {
+  if (student.message) {
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
         <Card className="bg-danger-50">
-          <CardHeader>{todayLogs.message}</CardHeader>
+          <CardHeader>{student.message}</CardHeader>
         </Card>
       </main>
     );
   }
 
-  const todaysLogsSort =
-    !loading && todayLogs ? [...todayLogs.logs].reverse() : [];
+  const todaysLogsSort = !loading && student ? [...student.logs].reverse() : [];
 
-  if (todayLogs && Object.keys(todayLogs).length > 1) {
+  if (student && Object.keys(student).length > 1) {
     const [maxTodayKey, maxTodayVal] = Object.entries(
-      todayLogs.activities.today,
+      student.activities.today,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxMonthKey, maxMonthVal] = Object.entries(
-      todayLogs.activities.month,
+      student.activities.month,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxYearKey, maxYearVal] = Object.entries(
-      todayLogs.activities.year,
+      student.activities.year,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10">
-        <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">
-          <div className="flex sm:items-center gap-2 max-sm:flex-col grow">
-            <h1 className="text-5xl grow">
-              Hello {!loading && todayLogs && todayLogs.user.name}
-            </h1>
-            {!loading && todayLogs && todayLogs.user.is_class_teacher && (
-              <Tooltip content="Teacher">
-                <Button
-                  as={Link}
-                  href={"/account/" + todayLogs.user.my_class?.id}
-                  variant="light"
-                  color="success"
-                  className="w-max"
-                >
-                  <GraduationCap />
-                  Go to your class
-                </Button>
-              </Tooltip>
-            )}
+        <section className="flex items-center max-sm:flex-wrap gap-2">
+          <div className="flex sm:items-center gap-2 max-sm:flex-col">
+            <h1 className="text-5xl">{student.student.name}</h1>
           </div>
-
-          <Button
-            as={Link}
-            href="/account/add"
-            variant="flat"
-            size="lg"
-            color="success"
-            startContent={<Plus />}
-          >
-            Add Log
-          </Button>
+          <Chip variant="dot" color="primary">
+            {student.student.class}
+          </Chip>
         </section>
 
         <section className="mt-6">
@@ -203,13 +186,12 @@ export function Page() {
                 <>
                   <h2>
                     <strong>Today&apos;s Emission:</strong>{" "}
-                    {todayLogs.emission_stats.total_emission.today ?? 0} kg of
-                    CO
+                    {student.emission_stats.total_emission.today ?? 0} kg of CO
                     <sub>2</sub>
                   </h2>
                   <h2>
                     <strong>Today&apos;s Average Emission:</strong>{" "}
-                    {todayLogs.emission_stats.average_emission.today ?? 0} kg of
+                    {student.emission_stats.average_emission.today ?? 0} kg of
                     CO
                     <sub>2</sub>
                   </h2>
@@ -265,22 +247,14 @@ export function Page() {
             <Card>
               <CardHeader>
                 <h3>
-                  You should add some logs today! Click on{" "}
-                  <Link
-                    href="/account/add"
-                    color="success"
-                    underline="focus"
-                    isBlock
-                  >
-                    Add Log
-                  </Link>
+                  {student.student.name} hasn&apos;t added any logs for today.
                 </h3>
               </CardHeader>
             </Card>
           )}
         </section>
 
-        {todayLogs.emission_stats && (
+        {student.emission_stats && (
           <section className="mt-6">
             <h1 className="font-semibold text-3xl">Stats</h1>
 
@@ -292,15 +266,14 @@ export function Page() {
                     <h3>
                       <strong>Today&apos;s Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.today} kg of CO
+                        {student.emission_stats.total_emission.today} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
                     <h3>
                       <strong>Today&apos;s Avg Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.today} kg of
-                        CO
+                        {student.emission_stats.average_emission.today} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
@@ -335,15 +308,14 @@ export function Page() {
                     <h3>
                       <strong>Month&apos;s Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.month} kg of CO
+                        {student.emission_stats.total_emission.month} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
                     <h3>
                       <strong>Month&apos;s Avg Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.month} kg of
-                        CO
+                        {student.emission_stats.average_emission.month} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
@@ -378,15 +350,14 @@ export function Page() {
                     <h3>
                       <strong>Year&apos;s Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.year} kg of CO
+                        {student.emission_stats.total_emission.year} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
                     <h3>
                       <strong>Year&apos;s Avg Emission: </strong>
                       <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.year} kg of
-                        CO
+                        {student.emission_stats.average_emission.year} kg of CO
                         <sub>2</sub>
                       </span>
                     </h3>
