@@ -350,7 +350,6 @@ export default buildConfig({
           if (roles.includes("principal") || roles.includes("admin")) {
             classData = await payload.find({
               collection: "classes",
-
               where: {
                 and: [
                   {
@@ -519,6 +518,132 @@ export default buildConfig({
         } catch (err) {
           console.error(err);
           res.status(500).json({ message: "Failed to fetch your class data." });
+        }
+      },
+    },
+
+    {
+      path: "/my-class/student",
+      method: "post",
+      handler: async (req, res, next) => {
+        try {
+          const user: User = req.user;
+          const { class_id, student_id } = req.body;
+
+          if (!user || !class_id || !student_id) {
+            res.status(403).json({
+              message: "You need to be logged in to view this.",
+            });
+            return;
+          }
+
+          const uid = user.id;
+          const roles = user.roles;
+          const access_roles = ["admin", "teacher", "principal"];
+
+          if (!roles.some((element) => access_roles.includes(element))) {
+            res.status(403).json({
+              message: "You need to be a teacher to access this.",
+            });
+            return;
+          }
+
+          const checkIfStudentInClass = await payload.find({
+            collection: "classes",
+            where: {
+              and: [
+                {
+                  id: {
+                    equals: class_id,
+                  },
+                },
+                {
+                  "students.id": {
+                    contains: student_id,
+                  },
+                },
+              ],
+            },
+          });
+
+          if (checkIfStudentInClass.totalDocs === 0) {
+            res.status(404).json({ message: "Student is not in this class." });
+            return;
+          }
+
+          const data = await payload.find({
+            collection: "footprint",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: student_id,
+                  },
+                },
+              ],
+            },
+          });
+
+          const date = new Date();
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          const todayEnd = new Date();
+          todayEnd.setHours(23, 59, 59, 999);
+          const logs = data.docs[0].logs;
+          const todayLogs = logs.filter((log) => {
+            const timestamp = new Date(log.timestamp);
+            return timestamp >= todayStart && timestamp <= todayEnd;
+          });
+
+          let emission_stats = data.docs[0].emission_stats;
+          if (todayLogs.length === 0) {
+            emission_stats.total_emission.today = 0;
+            emission_stats.average_emission.today = 0;
+          }
+
+          const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
+          const todaysActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const monthsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+          const yearsActivitiesEmission = Object.fromEntries(
+            activities.map((activity) => [activity, 0])
+          );
+
+          todayLogs.forEach(
+            (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+          );
+
+          const month = date.getMonth() + 1;
+          const monthLogs = logs.filter(
+            (log) => log.timestamp.split("-")[1] === String(month)
+          );
+          monthLogs.forEach(
+            (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+          );
+
+          const year = date.getFullYear();
+          const yearLogs = logs.filter(
+            (log) => log.timestamp.split("-")[0] === String(year)
+          );
+          yearLogs.forEach(
+            (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+          );
+
+          res.status(200).json({
+            emission_stats,
+            logs: todayLogs,
+            activities: {
+              today: todaysActivitiesEmission,
+              month: monthsActivitiesEmission,
+              year: yearsActivitiesEmission,
+            },
+          });
+        } catch (err) {
+          console.error(err);
+          res.status(500).json({ message: err });
         }
       },
     },
