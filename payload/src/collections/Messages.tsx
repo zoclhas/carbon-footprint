@@ -1,9 +1,38 @@
-import { CollectionConfig } from "payload/types";
+import { AccessArgs, CollectionConfig } from "payload/types";
 import { Message } from "../payload-types";
 import payload from "payload";
+import { checkRole } from "./Users/checkRole";
+import { anyone } from "../access/access";
+
+const access = async (args: AccessArgs<any, any>) => {
+  const req = args.req;
+  const user = req.user;
+  console.log(args.data, args.id);
+
+  if (checkRole(["admin", "teacher", "principal"], user)) {
+    return true;
+  }
+
+  return user.id === req.query.uid;
+};
+
+const uDCAccess = async (args: AccessArgs<any, any>) => {
+  const req = args.req;
+  const user = req.user;
+
+  if (checkRole(["admin", "teacher", "principal"], user)) {
+    return true;
+  }
+};
 
 export const Messages: CollectionConfig = {
   slug: "messages",
+  // access: {
+  //   read: anyone,
+  //   update: anyone,
+  //   delete: anyone,
+  //   create: anyone,
+  // },
   fields: [
     {
       name: "from",

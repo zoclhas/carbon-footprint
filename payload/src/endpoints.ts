@@ -650,10 +650,10 @@ export const endpoints: Endpoint[] = [
   },
 
   {
-    path: "/messages",
+    path: "/my-messages",
     method: "get",
     handler: async (req, res, next) => {
-      const user = req.user;
+      const user: User = req.user;
       if (!user) {
         res.status(403).json({
           message: "You need to be logged in to view your messages.",
@@ -661,20 +661,42 @@ export const endpoints: Endpoint[] = [
         return;
       }
 
-      const messages = await payload.find({
+      const readMessages = await payload.find({
         collection: "messages",
         where: {
           and: [
             {
               to: {
-                equals: user,
+                equals: user.id,
+              },
+            },
+            {
+              is_read: {
+                equals: true,
+              },
+            },
+          ],
+        },
+      });
+      const unreadMessages = await payload.find({
+        collection: "messages",
+        where: {
+          and: [
+            {
+              to: {
+                equals: user.id,
+              },
+            },
+            {
+              is_read: {
+                equals: false,
               },
             },
           ],
         },
       });
 
-      res.status(200).json(messages);
+      res.status(200).json({ read: readMessages, unread: unreadMessages });
     },
   },
 ];
