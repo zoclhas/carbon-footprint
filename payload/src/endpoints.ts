@@ -648,4 +648,33 @@ export const endpoints: Endpoint[] = [
       }
     },
   },
+
+  {
+    path: "/messages",
+    method: "get",
+    handler: async (req, res, next) => {
+      const user = req.user;
+      if (!user) {
+        res.status(403).json({
+          message: "You need to be logged in to view your messages.",
+        });
+        return;
+      }
+
+      const messages = await payload.find({
+        collection: "messages",
+        where: {
+          and: [
+            {
+              to: {
+                equals: user,
+              },
+            },
+          ],
+        },
+      });
+
+      res.status(200).json(messages);
+    },
+  },
 ];
