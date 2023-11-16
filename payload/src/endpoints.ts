@@ -515,6 +515,36 @@ export const endpoints: Endpoint[] = [
           return;
         }
 
+        if (
+          roles.includes("teacher") &&
+          !roles.some((element) => ["admin", "principal"].includes(element))
+        ) {
+          const checkIfTeacherIsClassTeacher = await payload.find({
+            collection: "classes",
+            where: {
+              and: [
+                {
+                  id: {
+                    equals: class_id,
+                  },
+                },
+                {
+                  class_teacher: {
+                    equals: uid,
+                  },
+                },
+              ],
+            },
+          });
+
+          if (checkIfTeacherIsClassTeacher.totalDocs === 0) {
+            res.status(403).json({
+              message: "You need to be a teacher of this class to access this.",
+            });
+            return;
+          }
+        }
+
         const checkIfStudentInClass = await payload.find({
           collection: "classes",
           where: {
