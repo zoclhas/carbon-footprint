@@ -640,6 +640,7 @@ export default buildConfig({
               month: monthsActivitiesEmission,
               year: yearsActivitiesEmission,
             },
+            student: data.docs[0].user["name"],
           });
         } catch (err) {
           console.error(err);
