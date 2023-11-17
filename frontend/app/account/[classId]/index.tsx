@@ -150,7 +150,7 @@ export function MyClass({
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getClassDetails();
     }
-  });
+  }, []);
   useEffect(() => {
     setCurrTab(tab);
   }, [tab]);
@@ -293,7 +293,7 @@ export function MyClass({
                   <strong>
                     {classDetails.student_with_highest_emission.student.name}
                   </strong>{" "}
-                  has produced the most carbon footprint with{" "}
+                  has produced the most carbon footprint today with{" "}
                   <strong>
                     {classDetails.student_with_highest_emission.emission} kg of
                     CO
@@ -327,11 +327,7 @@ export function MyClass({
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <canvas
-                    id="today-graph"
-                    ref={todayChartCanvas}
-                    height={398}
-                  ></canvas>
+                  <canvas id="today-graph" ref={todayChartCanvas}></canvas>
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
@@ -374,7 +370,7 @@ export function MyClass({
                   <canvas
                     id="month-graph"
                     ref={monthChartCanvas}
-                    height={398}
+                    height={298}
                   ></canvas>
                 </CardBody>
                 <CardFooter>
@@ -415,11 +411,7 @@ export function MyClass({
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <canvas
-                    id="year-graph"
-                    ref={yearChartCanvas}
-                    height={398}
-                  ></canvas>
+                  <canvas id="year-graph" ref={yearChartCanvas}></canvas>
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">

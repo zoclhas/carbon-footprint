@@ -307,11 +307,7 @@ export function Page() {
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <canvas
-                    id="today-graph"
-                    ref={todayChartCanvas}
-                    height={398}
-                  ></canvas>
+                  <canvas id="today-graph" ref={todayChartCanvas}></canvas>
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
@@ -353,7 +349,7 @@ export function Page() {
                   <canvas
                     id="month-graph"
                     ref={monthChartCanvas}
-                    height={398}
+                    height={298}
                   ></canvas>
                 </CardBody>
                 <CardFooter>
@@ -393,11 +389,7 @@ export function Page() {
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <canvas
-                    id="year-graph"
-                    ref={yearChartCanvas}
-                    height={398}
-                  ></canvas>
+                  <canvas id="year-graph" ref={yearChartCanvas}></canvas>
                 </CardBody>
                 <CardFooter>
                   <h4 className="text-base">
