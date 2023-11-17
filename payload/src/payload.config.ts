@@ -1,17 +1,19 @@
 import path from "path";
 
+import payload from "payload";
 import { payloadCloud } from "@payloadcms/plugin-cloud";
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { webpackBundler } from "@payloadcms/bundler-webpack";
 import { slateEditor } from "@payloadcms/richtext-slate";
 import { buildConfig } from "payload/config";
+import { v4 as uuid } from "uuid";
 
 import Users from "./collections/Users";
 import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
 import ClassSections from "./collections/Classses";
-import { endpoints } from "./endpoints";
 import Messages from "./collections/Messages";
+import { endpoints } from "./endpoints";
 
 export default buildConfig({
   admin: {
@@ -30,5 +32,48 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI,
   }),
-  endpoints,
+  endpoints: [
+    {
+      path: "/user/reset",
+      method: "post",
+      handler: async (req, res, next) => {
+        try {
+          const body = req.body;
+          const resetUser = await payload.resetPassword({
+            collection: "users",
+            data: {
+              token: body.token,
+              password: body.password,
+            },
+            overrideAccess: true,
+          });
+
+          const uid = resetUser.user.id;
+          await payload.update({
+            collection: "users",
+            where: {
+              and: [
+                {
+                  id: {
+                    equals: uid,
+                  },
+                },
+              ],
+            },
+            data: {
+              apiKey: uuid(),
+            },
+          });
+
+          res.status(200).json({
+            message: "Password reset successfully.",
+          });
+        } catch (err) {
+          console.error(err);
+          res.status(500).json(err);
+        }
+      },
+    },
+    ...endpoints,
+  ],
 });

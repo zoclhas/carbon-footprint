@@ -1,7 +1,7 @@
 "use client";
 
-import { redirect, useRouter } from "next/navigation";
-import { User, UserProps } from "@/payload-types";
+import { useRouter } from "next/navigation";
+import { UserProps } from "@/payload-types";
 import {
   Button,
   Card,
@@ -11,15 +11,16 @@ import {
   Divider,
   Input,
 } from "@nextui-org/react";
-import { PasswordInput } from "@/components/password";
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { getCookie } from "cookies-next";
 
 export const Form = ({ token }: { token: string }) => {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("user", {});
   const [visible, setVisible] = useState<boolean>(false);
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const toggleVisibility = () => setVisible(!visible);
 
   const submitHandler = async (data: FormData) => {
@@ -35,17 +36,14 @@ export const Form = ({ token }: { token: string }) => {
     headers.append("Content-Type", "application/json");
 
     try {
-      const res = await fetch(
-        process.env.NEXT_PUBLIC_API + "/api/users/reset-password",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({
-            token: token,
-            password: confirmPassword,
-          }),
-        },
-      );
+      const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/user/reset", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({
+          token: token,
+          password: confirmPassword,
+        }),
+      });
 
       if (!res.ok) {
         const err = await res.json();
@@ -68,7 +66,7 @@ export const Form = ({ token }: { token: string }) => {
     }
   };
 
-  if (Object.keys(user).length > 1) {
+  if (user && Object.keys(user).length > 1) {
     router.push("/account");
   }
 
