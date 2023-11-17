@@ -205,6 +205,7 @@ export interface Message {
   message?: string;
   read: MessageProps;
   unread: MessageProps;
+  show_sent: boolean;
 }
 
 export interface MessageProps {

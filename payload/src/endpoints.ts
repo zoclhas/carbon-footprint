@@ -662,6 +662,12 @@ export const endpoints: Endpoint[] = [
           return;
         }
 
+        const roles = user.roles;
+        const access_roles = ["teacher", "principal"];
+        const showSent = roles.some((element) =>
+          access_roles.includes(element)
+        );
+
         const readMessages = await payload.find({
           collection: "messages",
           where: {
@@ -701,7 +707,87 @@ export const endpoints: Endpoint[] = [
           depth: 1,
         });
 
-        res.status(200).json({ read: readMessages, unread: unreadMessages });
+        res.status(200).json({
+          read: readMessages,
+          unread: unreadMessages,
+          show_sent: showSent,
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
+      }
+    },
+  },
+
+  {
+    path: "/my-messages/sent",
+    method: "get",
+    handler: async (req, res, next) => {
+      try {
+        const user: User = req.user;
+        if (!user) {
+          res.status(403).json({
+            message: "You need to be logged in to view your messages.",
+          });
+          return;
+        }
+
+        const roles = user.roles;
+        const access_roles = ["teacher", "principal"];
+        const showSent = roles.some((element) =>
+          access_roles.includes(element)
+        );
+
+        if (!showSent) {
+          res
+            .status(403)
+            .json({ message: "You arent authorised to view this." });
+        }
+
+        const readMessages = await payload.find({
+          collection: "messages",
+          where: {
+            and: [
+              {
+                from: {
+                  equals: user.id,
+                },
+              },
+              {
+                is_read: {
+                  equals: true,
+                },
+              },
+            ],
+          },
+          sort: "-createdAt",
+          depth: 1,
+        });
+        const unreadMessages = await payload.find({
+          collection: "messages",
+          where: {
+            and: [
+              {
+                from: {
+                  equals: user.id,
+                },
+              },
+              {
+                is_read: {
+                  equals: false,
+                },
+              },
+            ],
+          },
+          sort: "-createdAt",
+          depth: 1,
+        });
+
+        res.status(200).json({
+          read: readMessages,
+          unread: unreadMessages,
+          show_sent: showSent,
+        });
       } catch (err) {
         console.error(err);
         res.status(500).json(err);

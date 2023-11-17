@@ -6,4 +6,10 @@ export const metadata: Metadata = {
   description: "Login in view your messages.",
 };
 
-export default MessagesPage;
+export default function Messages({
+  searchParams,
+}: {
+  searchParams: { tab: "received" | "sent" | null };
+}) {
+  return <MessagesPage tab={searchParams.tab ?? "received"} />;
+}

@@ -13,10 +13,11 @@ import {
   Link,
   Spinner,
   Tooltip,
+  ButtonGroup,
 } from "@nextui-org/react";
-import { CheckCheck, Eye } from "lucide-react";
+import { CheckCheck, Eye, Send } from "lucide-react";
 
-export function MessagesPage() {
+export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState<number>(0);
   //@ts-ignore
@@ -28,7 +29,7 @@ export function MessagesPage() {
   headers.append("Content-Type", "application/json");
 
   useEffect(() => {
-    const getMessageCount = async () => {
+    const getMessages = async () => {
       const res = await fetch(
         process.env.NEXT_PUBLIC_API + "/api/my-messages",
         {
@@ -42,11 +43,30 @@ export function MessagesPage() {
       setLoading(false);
     };
 
+    const getSentMessages = async () => {
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API + "/api/my-messages/sent",
+        {
+          method: "GET",
+          headers: headers,
+        },
+      );
+      const data: Message = await res.json();
+
+      setMessages(data);
+      setLoading(false);
+    };
+
     if (user) {
+      setLoading(true);
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
-      getMessageCount();
+      if (tab === "sent") {
+        getSentMessages();
+      } else {
+        getMessages();
+      }
     }
-  }, [user, refetch]);
+  }, [user, refetch, tab]);
 
   if (loading) {
     return (
@@ -78,8 +98,35 @@ export function MessagesPage() {
   if (messages.unread && messages.read) {
     const unread = messages.unread;
     const read = messages.read;
+    console.log(messages);
+
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10 flex flex-col gap-10">
+        {messages.show_sent && (
+          <ButtonGroup className="w-full flex justify-start ">
+            <Button
+              size="lg"
+              as={Link}
+              href="/messages?tab=received"
+              variant={tab === "received" ? "flat" : "faded"}
+              color="success"
+              startContent={<Send className="rotate-180" />}
+            >
+              Recevied
+            </Button>
+            <Button
+              size="lg"
+              as={Link}
+              href="/messages?tab=sent"
+              variant={tab === "sent" ? "flat" : "faded"}
+              color="success"
+              startContent={<Send />}
+            >
+              Sent
+            </Button>
+          </ButtonGroup>
+        )}
+
         <section>
           <h1 className="font-semibold text-3xl">
             Unread Messages&nbsp;
@@ -103,7 +150,15 @@ export function MessagesPage() {
                 <Card key={msg.id}>
                   <CardHeader className="flex justify-between gap-2">
                     <h2 className="text-lg">
-                      From&nbsp;<strong>{msg.from.name}</strong>
+                      {tab === "received" ? (
+                        <>
+                          From&nbsp;<strong>{msg.from.name}</strong>
+                        </>
+                      ) : (
+                        <>
+                          To&nbsp;<strong>{msg.to.name}</strong>
+                        </>
+                      )}
                     </h2>
 
                     <Tooltip content="Mark as read">
@@ -168,7 +223,15 @@ export function MessagesPage() {
                 <Card key={msg.id}>
                   <CardHeader className="flex justify-between gap-2">
                     <h2 className="text-lg">
-                      From&nbsp;<strong>{msg.from.name}</strong>
+                      {tab === "received" ? (
+                        <>
+                          From&nbsp;<strong>{msg.from.name}</strong>
+                        </>
+                      ) : (
+                        <>
+                          To&nbsp;<strong>{msg.to.name}</strong>
+                        </>
+                      )}
                     </h2>
                   </CardHeader>
                   <Divider />
@@ -177,17 +240,19 @@ export function MessagesPage() {
                   <CardFooter className="flex justify-between gap-2">
                     <h3>{sentAt}</h3>
                     <div className="flex">
-                      <Tooltip content="View message">
-                        <Button
-                          variant="light"
-                          color="primary"
-                          isIconOnly
-                          as={Link}
-                          href={"/messages/" + msg.id}
-                        >
-                          <Eye />
-                        </Button>
-                      </Tooltip>
+                      {tab === "received" && (
+                        <Tooltip content="View message">
+                          <Button
+                            variant="light"
+                            color="primary"
+                            isIconOnly
+                            as={Link}
+                            href={"/messages/" + msg.id}
+                          >
+                            <Eye />
+                          </Button>
+                        </Tooltip>
+                      )}
                       <Tooltip content="Message read">
                         <Button
                           variant="light"
