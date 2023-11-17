@@ -13,12 +13,14 @@ import {
   CardFooter,
 } from "@nextui-org/react";
 import { Bike, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { getCookie } from "cookies-next";
 
 export function Page() {
   const router = useRouter();
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const userDetails = user && user.user;
 
   const date = new Date();
@@ -34,7 +36,7 @@ export function Page() {
   const rightNowISO = date.toISOString();
 
   const submitHandler = async (data: FormData) => {
-    const apiKey = userDetails.apiKey;
+    const apiKey = userDetails!.apiKey;
     const activity = data.get("activity")!;
     const distance = data.get("distance")!;
     const people = data.get("people")!;

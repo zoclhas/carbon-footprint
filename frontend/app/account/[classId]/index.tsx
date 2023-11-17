@@ -22,8 +22,9 @@ import {
 } from "@nextui-org/react";
 import Chart from "chart.js/auto";
 import { Eye, PieChart, Users2 } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { getCookie } from "cookies-next";
 
 export const colors = {
   green: {
@@ -49,7 +50,8 @@ export function MyClass({
   //@ts-ignore
   const [classDetails, setClassDetails] = useState<MyClassProps>({});
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const [currTab, setCurrTab] = useState<"students" | "stats">("students");
 
   function capitalizeFirstLetter(str: string): string {
@@ -149,7 +151,7 @@ export function MyClass({
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getClassDetails();
     }
-  }, [user]);
+  });
   useEffect(() => {
     setCurrTab(tab);
   }, [tab]);
@@ -195,7 +197,7 @@ export function MyClass({
               <Chip
                 variant="flat"
                 color={
-                  classDetails.class_teacher.name === user.user.name
+                  classDetails.class_teacher.name === user!.user.name
                     ? "success"
                     : "warning"
                 }

@@ -19,11 +19,14 @@ import {
 import { LogIn, LogOut, User2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UserProps } from "@/payload-types";
+import { deleteCookie, getCookie } from "cookies-next";
 
 export const Login = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("user", null);
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const [mount, setMount] = useState(false);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export const Login = () => {
   }, []);
 
   const removeUser = (onClose: () => void) => {
-    localStorage.removeItem("user");
+    deleteCookie("user");
     onClose();
     router.push("/login");
     location.reload();

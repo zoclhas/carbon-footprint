@@ -38,7 +38,7 @@ export function StudentIdPage({
   classId: string;
   studentId: string;
 }) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(true);
   //@ts-ignore
   const [student, setStudent] = useState<ClassStudent>({});
@@ -71,7 +71,7 @@ export function StudentIdPage({
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getStudentDetails();
     }
-  }, [user]);
+  });
 
   function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -150,7 +150,7 @@ export function StudentIdPage({
   const [msgLoading, setMsgLoading] = useState<boolean>(false);
   const [msgData, setMsgData] = useState<MessageSendProps>({});
 
-  const sendMessage = async (formData: FormData) => {
+  const sendMessage = async (formData: FormData, onClose: () => void) => {
     setMsgLoading(true);
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
@@ -231,7 +231,7 @@ export function StudentIdPage({
               onSubmit={(e) => {
                 e.preventDefault();
                 // @ts-ignore
-                sendMessage(new FormData(e.currentTarget));
+                sendMessage(new FormData(e.currentTarget), onClose);
               }}
             >
               {(onClose) => (

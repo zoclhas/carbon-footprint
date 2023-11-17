@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { NavbarItem, Badge, Link, Button } from "@nextui-org/react";
 import { MessageCircle } from "lucide-react";
 import { UserProps, Message } from "@/payload-types";
+import { getCookie } from "cookies-next";
 
 export const MessageButton = () => {
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState<number>(0);
   const [messages, setMessages] = useState<number>(0);
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
@@ -31,11 +32,13 @@ export const MessageButton = () => {
       setLoading(false);
     };
 
+    // @ts-ignore
+    const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
     if (user) {
-      headers.append("Authorization", "users API-Key " + user.user.apiKey);
+      headers.append("Authorization", "users API-Key " + user!.user.apiKey);
       getMessageCount();
     }
-  }, [user, refetch]);
+  }, [refetch]);
 
   useEffect(() => {
     window.addEventListener("refetch-messages", () =>

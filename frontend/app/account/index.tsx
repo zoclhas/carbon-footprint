@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Chart from "chart.js/auto";
 import { colors } from "./[classId]";
+import { getCookie } from "cookies-next";
 
 export function Page() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function Page() {
   //@ts-ignore
   const [todayLogs, setTodayLogs] = useState<TodayLogsProps>({});
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
   useEffect(() => {
     const headers = new Headers();
@@ -44,10 +45,10 @@ export function Page() {
     };
 
     if (user) {
-      headers.append("Authorization", "users API-Key " + user.user.apiKey);
+      headers.append("Authorization", "users API-Key " + user!.user.apiKey);
       getTodayLogs();
     }
-  }, [user]);
+  }, []);
 
   function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -158,6 +159,8 @@ export function Page() {
     const [maxYearKey, maxYearVal] = Object.entries(
       todayLogs.activities.year,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
+
+    console.log(todayLogs.user);
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10">

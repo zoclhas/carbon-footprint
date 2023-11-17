@@ -2,7 +2,7 @@
 
 import { redirect, useRouter } from "next/navigation";
 import { User, UserProps } from "@/payload-types";
-import { setCookie } from "cookies-next";
+import { setCookie, getCookie } from "cookies-next";
 import {
   Button,
   Card,
@@ -17,7 +17,8 @@ import useLocalStorage from "@/lib/use-local-store";
 
 export const Form = () => {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("user", {});
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
   const submitHandler = async (data: FormData) => {
     const email = data.get("email")!;
@@ -52,7 +53,7 @@ export const Form = () => {
     }
   };
 
-  if (Object.keys(user).length > 1) {
+  if (user && Object.keys(user).length > 1) {
     router.push("/account");
   }
 

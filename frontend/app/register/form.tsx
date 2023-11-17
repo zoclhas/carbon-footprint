@@ -14,10 +14,13 @@ import {
 import useLocalStorage from "@/lib/use-local-store";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { UserProps } from "@/payload-types";
+import { getCookie, setCookie } from "cookies-next";
 
 export const Form = () => {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage("user", {});
+  // @ts-ignore
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const [visible, setVisible] = useState<boolean>(false);
   const toggleVisibility = () => setVisible(!visible);
 
@@ -74,13 +77,18 @@ export const Form = () => {
       const loginUser = await loginRes.json();
 
       // @ts-ignore
-      setUser(loginUser);
+      setCookie("user", JSON.stringify(loginUser), {
+        maxAge: 2650000,
+      });
+
+      router.push("/account");
+      location.reload();
     } catch (err) {
       console.error(err);
     }
   };
 
-  if (Object.keys(user).length > 1) {
+  if (user && Object.keys(user).length > 1) {
     router.push("/account");
     location.reload();
   }

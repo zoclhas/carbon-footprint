@@ -5,13 +5,14 @@ import { MessageProps, UserProps, Message } from "@/payload-types";
 import { useState, useEffect } from "react";
 import { Spinner, Card, CardHeader, Button, Tooltip } from "@nextui-org/react";
 import { CheckCheck } from "lucide-react";
+import { getCookie } from "cookies-next";
 
 export function MessageId({ msgId }: { msgId: string }) {
   const [loading, setLoading] = useState(true);
   //@ts-ignore
   const [message, setMessage] = useState<MessageProps>({});
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
@@ -54,7 +55,7 @@ export function MessageId({ msgId }: { msgId: string }) {
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getMessageCount();
     }
-  }, [user]);
+  });
 
   if (loading) {
     return (

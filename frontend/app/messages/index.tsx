@@ -16,6 +16,7 @@ import {
   ButtonGroup,
 } from "@nextui-org/react";
 import { CheckCheck, Eye, Send } from "lucide-react";
+import { getCookie } from "cookies-next";
 
 export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   const [loading, setLoading] = useState(true);
@@ -23,7 +24,9 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   //@ts-ignore
   const [messages, setMessages] = useState<Message>({});
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
+
+  console.log(user);
 
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
@@ -66,7 +69,7 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
         getMessages();
       }
     }
-  }, [user, refetch, tab]);
+  }, [refetch, tab]);
 
   if (loading) {
     return (
@@ -77,7 +80,7 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   }
 
   const markMessageAsRead = async (id: string) => {
-    headers.append("Authorization", "users API-Key " + user.user.apiKey);
+    headers.append("Authorization", "users API-Key " + user!.user.apiKey);
 
     const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/my-messages", {
       method: "post",
