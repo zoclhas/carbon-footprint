@@ -225,3 +225,8 @@ export interface MessageProps {
     is_read: boolean;
   }[];
 }
+
+export interface MessageSendProps {
+  message?: string;
+  success?: boolean;
+}

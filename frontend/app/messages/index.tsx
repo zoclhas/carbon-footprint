@@ -161,33 +161,37 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
                       )}
                     </h2>
 
-                    <Tooltip content="Mark as read">
-                      <Button
-                        variant="flat"
-                        color="success"
-                        isIconOnly
-                        onPress={() => markMessageAsRead(msg.id)}
-                      >
-                        <CheckCheck />
-                      </Button>
-                    </Tooltip>
+                    {tab === "received" && (
+                      <Tooltip content="Mark as read">
+                        <Button
+                          variant="flat"
+                          color="success"
+                          isIconOnly
+                          onPress={() => markMessageAsRead(msg.id)}
+                        >
+                          <CheckCheck />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </CardHeader>
                   <Divider />
                   <CardBody>{msg.message}</CardBody>
                   <Divider />
                   <CardFooter className="flex justify-between gap-2">
                     <h3>{sentAt}</h3>
-                    <Tooltip content="View message">
-                      <Button
-                        variant="light"
-                        color="primary"
-                        isIconOnly
-                        as={Link}
-                        href={"/messages/" + msg.id}
-                      >
-                        <Eye />
-                      </Button>
-                    </Tooltip>
+                    {tab === "received" && (
+                      <Tooltip content="View message">
+                        <Button
+                          variant="light"
+                          color="primary"
+                          isIconOnly
+                          as={Link}
+                          href={"/messages/" + msg.id}
+                        >
+                          <Eye />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </CardFooter>
                 </Card>
               );

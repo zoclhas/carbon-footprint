@@ -1,7 +1,12 @@
 "use client";
 
 import useLocalStorage from "@/lib/use-local-store";
-import { UserProps, Activities, ClassStudent } from "@/payload-types";
+import {
+  UserProps,
+  Activities,
+  ClassStudent,
+  MessageSendProps,
+} from "@/payload-types";
 import { useState, useRef, useEffect } from "react";
 import Chart from "chart.js/auto";
 import { colors } from "@/app/account/[classId]/index";
@@ -10,15 +15,21 @@ import {
   CardHeader,
   Spinner,
   Button,
-  Link,
   Accordion,
   AccordionItem,
   Tooltip,
   CardBody,
   CardFooter,
   Chip,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Textarea,
+  ModalFooter,
 } from "@nextui-org/react";
-import { GraduationCap, Plus } from "lucide-react";
+import { Send } from "lucide-react";
 
 export function StudentIdPage({
   classId,
@@ -27,6 +38,7 @@ export function StudentIdPage({
   classId: string;
   studentId: string;
 }) {
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loading, setLoading] = useState(true);
   //@ts-ignore
   const [student, setStudent] = useState<ClassStudent>({});
@@ -135,6 +147,33 @@ export function StudentIdPage({
     }
   }, [student]);
 
+  const [msgLoading, setMsgLoading] = useState<boolean>(false);
+  const [msgData, setMsgData] = useState<MessageSendProps>({});
+
+  const sendMessage = async (formData: FormData) => {
+    setMsgLoading(true);
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "users API-Key " + user.user.apiKey);
+    const message = formData.get("message")!;
+
+    const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/send-message", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        stud_id: studentId,
+        message,
+      }),
+    });
+    const data: MessageSendProps = await res.json();
+    setMsgData(data);
+    setMsgLoading(false);
+
+    if (data.success) {
+      setTimeout(() => onClose, 1000);
+    }
+  };
+
   if (loading) {
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
@@ -168,13 +207,68 @@ export function StudentIdPage({
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10">
-        <section className="flex items-center max-sm:flex-wrap gap-2">
-          <div className="flex sm:items-center gap-2 max-sm:flex-col">
-            <h1 className="text-5xl">{student.student.name}</h1>
+        <section className="flex items-center justify-between max-sm:flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex sm:items-center gap-2 max-sm:flex-col">
+              <h1 className="text-5xl">{student.student.name}</h1>
+            </div>
+            <Chip variant="dot" color="primary">
+              {student.student.class}
+            </Chip>
           </div>
-          <Chip variant="dot" color="primary">
-            {student.student.class}
-          </Chip>
+          <Tooltip content="Send Message">
+            <Button
+              variant="flat"
+              color="warning"
+              startContent={<Send />}
+              isIconOnly
+              onPress={onOpen}
+            />
+          </Tooltip>
+          <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+            <ModalContent
+              as="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // @ts-ignore
+                sendMessage(new FormData(e.currentTarget));
+              }}
+            >
+              {(onClose) => (
+                <>
+                  {!msgLoading && msgData.success && (
+                    <ModalHeader>Sent Message!</ModalHeader>
+                  )}
+                  {!msgData.message && !msgData.success && (
+                    <>
+                      <ModalHeader>
+                        Send message to {student.student.name}
+                      </ModalHeader>
+                      <ModalBody>
+                        <Textarea
+                          name="message"
+                          isRequired
+                          label="Message"
+                          isDisabled={msgLoading}
+                        />
+                      </ModalBody>
+                      <ModalFooter className="flex justify-end">
+                        <Button
+                          type="submit"
+                          variant="flat"
+                          color="success"
+                          isLoading={msgLoading}
+                          startContent={!msgLoading && <Send />}
+                        >
+                          Send
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </>
+              )}
+            </ModalContent>
+          </Modal>
         </section>
 
         <section className="mt-6">
