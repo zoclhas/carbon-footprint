@@ -201,10 +201,25 @@ export interface ClassStudent {
 }
 
 export interface Message {
+  success?: boolean;
+  message?: string;
   read: MessageProps;
   unread: MessageProps;
 }
 
 interface MessageProps {
   totalDocs: number;
+  docs: {
+    id: string;
+    from: {
+      name: string;
+    };
+    to: {
+      name: string;
+    };
+    message: string;
+    createdAt: string;
+    updatedAt: string;
+    is_read: boolean;
+  }[];
 }

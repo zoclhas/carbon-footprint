@@ -8,6 +8,7 @@ import { UserProps, Message } from "@/payload-types";
 
 export const MessageButton = () => {
   const [loading, setLoading] = useState(true);
+  const [refetch, setRefetch] = useState<number>(0);
   const [messages, setMessages] = useState<number>(0);
   // @ts-ignore
   const [user]: UserProps[] = useLocalStorage("user", null);
@@ -34,7 +35,19 @@ export const MessageButton = () => {
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getMessageCount();
     }
-  }, [user]);
+  }, [user, refetch]);
+
+  useEffect(() => {
+    window.addEventListener("refetch-messages", () =>
+      setRefetch((prev) => prev + 1),
+    );
+
+    return () => {
+      window.removeEventListener("refetch-messages", () =>
+        setRefetch((prev) => prev + 1),
+      );
+    };
+  }, []);
 
   if (user) {
     if (messages > 0) {
