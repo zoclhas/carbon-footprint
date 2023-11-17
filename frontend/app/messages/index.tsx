@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalStorage from "@/lib/use-local-store";
 import { Message, UserProps } from "@/payload-types";
 import { useState, useEffect } from "react";
 import {

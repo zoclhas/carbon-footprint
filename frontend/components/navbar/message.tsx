@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalStorage from "@/lib/use-local-store";
 import { useEffect, useState } from "react";
 import { NavbarItem, Badge, Link, Button } from "@nextui-org/react";
 import { MessageCircle } from "lucide-react";

@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalStorage from "@/lib/use-local-store";
 import { Log, UserProps } from "@/payload-types";
 import {
   Button,

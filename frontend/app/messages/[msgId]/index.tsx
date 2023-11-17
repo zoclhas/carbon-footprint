@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalStorage from "@/lib/use-local-store";
 import { MessageProps, UserProps, Message } from "@/payload-types";
 import { useState, useEffect } from "react";
 import { Spinner, Card, CardHeader, Button, Tooltip } from "@nextui-org/react";

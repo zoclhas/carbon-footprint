@@ -13,7 +13,6 @@ import {
   Input,
 } from "@nextui-org/react";
 import { PasswordInput } from "@/components/password";
-import useLocalStorage from "@/lib/use-local-store";
 
 export const Form = () => {
   const router = useRouter();

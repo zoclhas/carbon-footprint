@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalStorage from "@/lib/use-local-store";
 import { UserProps, MyClassProps, Activities } from "@/payload-types";
 import {
   Chip,
