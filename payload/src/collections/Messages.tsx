@@ -59,9 +59,9 @@ export const Messages: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeValidate: [
-      async ({ originalDoc }) => {
-        const { id, from, to, message }: Message = originalDoc;
+    afterChange: [
+      async ({ doc }) => {
+        const { id, from, to, message } = doc;
 
         const fromUser = await payload.findByID({
           id: from,
@@ -95,6 +95,7 @@ export const Messages: CollectionConfig = {
         }
       },
     ],
+    beforeValidate: [async ({ data, originalDoc }) => {}],
   },
 };
 

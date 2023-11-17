@@ -13,15 +13,15 @@ export interface Config {
     classes: Class;
     messages: Message;
     media: Media;
-    "payload-preferences": PayloadPreference;
-    "payload-migrations": PayloadMigration;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
   };
   globals: {};
 }
 export interface User {
   id: string;
   name: string;
-  roles?: ("admin" | "principal" | "teacher" | "user")[] | null;
+  roles?: ('admin' | 'principal' | 'teacher' | 'user')[] | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -42,7 +42,7 @@ export interface Footprint {
   logs?:
     | {
         timestamp: string;
-        activity: "car" | "bus" | "metro" | "cycle" | "walk" | "plane";
+        activity: 'car' | 'bus' | 'metro' | 'cycle' | 'walk' | 'plane';
         distance: number;
         people: number;
         emission?: number | null;
@@ -68,7 +68,7 @@ export interface Class {
   id: string;
   class: number;
   section: string;
-  level?: ("senior" | "middle" | "primary") | null;
+  level?: ('senior' | 'middle' | 'primary') | null;
   class_teacher: string | User;
   students: (string | User)[];
   combined_class_section?: string | null;
@@ -77,9 +77,10 @@ export interface Class {
 }
 export interface Message {
   id: string;
-  from: string;
-  to: string;
+  from: string | User;
+  to: string | User;
   message: string;
+  is_read?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -116,7 +117,7 @@ export interface Media {
 export interface PayloadPreference {
   id: string;
   user: {
-    relationTo: "users";
+    relationTo: 'users';
     value: string | User;
   };
   key?: string | null;
@@ -140,6 +141,7 @@ export interface PayloadMigration {
   createdAt: string;
 }
 
-declare module "payload" {
+
+declare module 'payload' {
   export interface GeneratedTypes extends Config {}
 }

@@ -653,50 +653,98 @@ export const endpoints: Endpoint[] = [
     path: "/my-messages",
     method: "get",
     handler: async (req, res, next) => {
-      const user: User = req.user;
-      if (!user) {
-        res.status(403).json({
-          message: "You need to be logged in to view your messages.",
+      try {
+        const user: User = req.user;
+        if (!user) {
+          res.status(403).json({
+            message: "You need to be logged in to view your messages.",
+          });
+          return;
+        }
+
+        const readMessages = await payload.find({
+          collection: "messages",
+          where: {
+            and: [
+              {
+                to: {
+                  equals: user.id,
+                },
+              },
+              {
+                is_read: {
+                  equals: true,
+                },
+              },
+            ],
+          },
+          sort: "-createdAt",
+          depth: 1,
         });
-        return;
+        const unreadMessages = await payload.find({
+          collection: "messages",
+          where: {
+            and: [
+              {
+                to: {
+                  equals: user.id,
+                },
+              },
+              {
+                is_read: {
+                  equals: false,
+                },
+              },
+            ],
+          },
+          sort: "-createdAt",
+          depth: 1,
+        });
+
+        res.status(200).json({ read: readMessages, unread: unreadMessages });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
       }
+    },
+  },
 
-      const readMessages = await payload.find({
-        collection: "messages",
-        where: {
-          and: [
-            {
-              to: {
-                equals: user.id,
-              },
-            },
-            {
-              is_read: {
-                equals: true,
-              },
-            },
-          ],
-        },
-      });
-      const unreadMessages = await payload.find({
-        collection: "messages",
-        where: {
-          and: [
-            {
-              to: {
-                equals: user.id,
-              },
-            },
-            {
-              is_read: {
-                equals: false,
-              },
-            },
-          ],
-        },
-      });
+  {
+    path: "/my-messages",
+    method: "post",
+    handler: async (req, res, next) => {
+      try {
+        const user: User = req.user;
+        const body: { mid: string } = req.body;
+        if (!user || !body || !body.mid) {
+          res.status(403).json({
+            message: "You need to be logged in to view your messages.",
+          });
+          return;
+        }
 
-      res.status(200).json({ read: readMessages, unread: unreadMessages });
+        const updateMessage = await payload.update({
+          collection: "messages",
+          where: {
+            and: [
+              { id: { equals: body.mid } },
+              {
+                to: {
+                  equals: user.id,
+                },
+              },
+            ],
+          },
+          data: {
+            is_read: true,
+          },
+        });
+
+        res.status(200).json({ success: true, message: "Updated" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
+      }
     },
   },
 ];
