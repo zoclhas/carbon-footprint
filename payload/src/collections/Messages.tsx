@@ -80,7 +80,6 @@ export const Messages: CollectionConfig = {
             View it here: ${process.env.FE_URL}/messages/${id}
           `,
         });
-        console.log(mail);
         console.log("sent");
       },
     ],

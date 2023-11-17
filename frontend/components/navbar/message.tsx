@@ -11,13 +11,18 @@ export const MessageButton = () => {
   const [loading, setLoading] = useState(true);
   const [refetch, setRefetch] = useState<number>(0);
   const [messages, setMessages] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
   // @ts-ignore
   const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
+  let headers = {
+    "Content-Type": "application/json",
+    Authorization: "",
+  };
 
   useEffect(() => {
+    setMounted(true);
+
     const getMessageCount = async () => {
       const res = await fetch(
         process.env.NEXT_PUBLIC_API + "/api/my-messages",
@@ -35,7 +40,7 @@ export const MessageButton = () => {
     // @ts-ignore
     const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
     if (user) {
-      headers.append("Authorization", "users API-Key " + user!.user.apiKey);
+      headers.Authorization = "users API-Key " + user!.user.apiKey;
       getMessageCount();
     }
   }, [refetch]);
@@ -52,7 +57,7 @@ export const MessageButton = () => {
     };
   }, []);
 
-  if (user) {
+  if (user && mounted) {
     if (messages > 0) {
       return (
         <NavbarItem>

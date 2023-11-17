@@ -39,6 +39,7 @@ const Users: CollectionConfig = {
         `;
       },
     },
+    tokenExpiration: new Date().getTime() + 900000000,
   },
   admin: {
     useAsTitle: "email",

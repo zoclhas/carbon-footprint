@@ -30,6 +30,7 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { Send } from "lucide-react";
+import { getCookie } from "cookies-next";
 
 export function StudentIdPage({
   classId,
@@ -43,7 +44,7 @@ export function StudentIdPage({
   //@ts-ignore
   const [student, setStudent] = useState<ClassStudent>({});
   // @ts-ignore
-  const [user]: UserProps[] = useLocalStorage("user", null);
+  const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
   useEffect(() => {
     const headers = new Headers();
@@ -71,7 +72,7 @@ export function StudentIdPage({
       headers.append("Authorization", "users API-Key " + user.user.apiKey);
       getStudentDetails();
     }
-  });
+  }, []);
 
   function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -154,7 +155,7 @@ export function StudentIdPage({
     setMsgLoading(true);
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
-    headers.append("Authorization", "users API-Key " + user.user.apiKey);
+    headers.append("Authorization", "users API-Key " + user!.user.apiKey);
     const message = formData.get("message")!;
 
     const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/send-message", {
@@ -170,7 +171,7 @@ export function StudentIdPage({
     setMsgLoading(false);
 
     if (data.success) {
-      setTimeout(() => onClose, 1000);
+      setTimeout(() => onClose(), 1000);
     }
   };
 
@@ -226,16 +227,14 @@ export function StudentIdPage({
             />
           </Tooltip>
           <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
-            <ModalContent
-              as="form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                // @ts-ignore
-                sendMessage(new FormData(e.currentTarget), onClose);
-              }}
-            >
+            <ModalContent>
               {(onClose) => (
-                <>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendMessage(new FormData(e.currentTarget), onClose);
+                  }}
+                >
                   {!msgLoading && msgData.success && (
                     <ModalHeader>Sent Message!</ModalHeader>
                   )}
@@ -265,7 +264,7 @@ export function StudentIdPage({
                       </ModalFooter>
                     </>
                   )}
-                </>
+                </form>
               )}
             </ModalContent>
           </Modal>

@@ -19,7 +19,6 @@ import { getCookie } from "cookies-next";
 export function Page() {
   const router = useRouter();
   // @ts-ignore
-  // @ts-ignore
   const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const userDetails = user && user.user;
 

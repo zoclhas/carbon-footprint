@@ -26,10 +26,10 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   // @ts-ignore
   const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
-  console.log(user);
-
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
+  let headers = {
+    "Content-Type": "application/json",
+    Authorization: "",
+  };
 
   useEffect(() => {
     const getMessages = async () => {
@@ -62,7 +62,7 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
 
     if (user) {
       setLoading(true);
-      headers.append("Authorization", "users API-Key " + user.user.apiKey);
+      headers.Authorization = "users API-Key " + user!.user.apiKey;
       if (tab === "sent") {
         getSentMessages();
       } else {
@@ -80,7 +80,7 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   }
 
   const markMessageAsRead = async (id: string) => {
-    headers.append("Authorization", "users API-Key " + user!.user.apiKey);
+    headers.Authorization = "users API-Key " + user!.user.apiKey;
 
     const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/my-messages", {
       method: "post",
@@ -101,7 +101,6 @@ export function MessagesPage({ tab }: { tab: "received" | "sent" | null }) {
   if (messages.unread && messages.read) {
     const unread = messages.unread;
     const read = messages.read;
-    console.log(messages);
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10 flex flex-col gap-10">
