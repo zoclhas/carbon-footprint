@@ -12,7 +12,7 @@ const ClassSections: CollectionConfig = {
     defaultColumns: ["combined_class_section", "class_teacher"],
   },
   access: {
-    read: ({ req: { user, query }, data, id }) => {
+    read: ({ req: { user } }) => {
       if (checkRole(["admin", "teacher", "principal"], user)) {
         return true;
       }

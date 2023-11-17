@@ -875,4 +875,57 @@ export const endpoints: Endpoint[] = [
       }
     },
   },
+
+  {
+    path: "/send-message",
+    method: "post",
+    handler: async (req, res, next) => {
+      try {
+        const user: User = req.user;
+        const body: { stud_id: string; message: string } = req.body;
+
+        if (!user || !body || !body.stud_id || !body.message) {
+          res.status(403).json({
+            message: "You need to be logged in to view your messages.",
+          });
+          return;
+        }
+
+        const roles = user.roles;
+        const access_roles = ["teacher", "principal"];
+        const sendMessageAccess = roles.some((element) =>
+          access_roles.includes(element)
+        );
+
+        if (!sendMessageAccess) {
+          res
+            .status(403)
+            .json({ message: "You arent authorised to send this." });
+        }
+
+        const toUser = await payload.findByID({
+          collection: "users",
+          id: body.stud_id,
+        });
+
+        await payload.create({
+          collection: "messages",
+          data: {
+            from: user.id,
+            to: toUser.id,
+            message: body.message,
+          },
+          user,
+          depth: 0,
+        });
+
+        res.status(200).json({
+          success: true,
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
+      }
+    },
+  },
 ];
