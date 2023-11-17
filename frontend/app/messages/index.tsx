@@ -100,7 +100,7 @@ export function MessagesPage() {
               });
 
               return (
-                <Card key={msg.id} as={Link}>
+                <Card key={msg.id}>
                   <CardHeader className="flex justify-between gap-2">
                     <h2 className="text-lg">
                       From&nbsp;<strong>{msg.from.name}</strong>
@@ -128,7 +128,7 @@ export function MessagesPage() {
                         color="primary"
                         isIconOnly
                         as={Link}
-                        href={"/message" + msg.id}
+                        href={"/messages/" + msg.id}
                       >
                         <Eye />
                       </Button>
@@ -183,7 +183,7 @@ export function MessagesPage() {
                           color="primary"
                           isIconOnly
                           as={Link}
-                          href={"/message" + msg.id}
+                          href={"/messages/" + msg.id}
                         >
                           <Eye />
                         </Button>

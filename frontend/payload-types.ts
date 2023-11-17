@@ -207,7 +207,8 @@ export interface Message {
   unread: MessageProps;
 }
 
-interface MessageProps {
+export interface MessageProps {
+  message?: string;
   totalDocs: number;
   docs: {
     id: string;

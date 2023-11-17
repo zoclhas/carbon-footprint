@@ -747,4 +747,46 @@ export const endpoints: Endpoint[] = [
       }
     },
   },
+
+  {
+    path: "/my-messages/:id",
+    method: "get",
+    handler: async (req, res, next) => {
+      try {
+        const user: User = req.user;
+        const mid = req.params.id;
+
+        if (!user || !mid) {
+          res.status(403).json({
+            message: "You need to be logged in to view your messages.",
+          });
+          return;
+        }
+
+        const message = await payload.find({
+          collection: "messages",
+          where: {
+            and: [
+              { id: { equals: mid } },
+              {
+                to: {
+                  equals: user.id,
+                },
+              },
+            ],
+          },
+        });
+
+        if (message.totalDocs === 0) {
+          res.status(404).json({ message: "No message found." });
+          return;
+        }
+
+        res.status(200).json(message);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
+      }
+    },
+  },
 ];

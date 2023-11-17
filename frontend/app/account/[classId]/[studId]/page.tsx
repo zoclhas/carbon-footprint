@@ -1,4 +1,10 @@
 import { StudentIdPage } from ".";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Class | Student | CarbTrkr",
+  description: "Login in view your class.",
+};
 
 export default function SudentId({
   params,
