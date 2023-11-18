@@ -12,7 +12,10 @@ import Users from "./collections/Users";
 import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
 import ClassSections from "./collections/Classses";
+import Events from "./collections/Events";
 import Messages from "./collections/Messages";
+
+import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
 
 export default buildConfig({
@@ -20,8 +23,8 @@ export default buildConfig({
     user: Users.slug,
     bundler: webpackBundler(),
   },
-  editor: slateEditor({}),
-  collections: [Users, Footprint, ClassSections, Messages, Media],
+  editor: slateEditor(slateOptions),
+  collections: [Users, Footprint, ClassSections, Events, Messages, Media],
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),
   },
