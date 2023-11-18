@@ -46,6 +46,9 @@ export const Form = () => {
     setCookie("user", JSON.stringify(userData), {
       maxAge: 30 * 24 * 60 * 60,
     });
+
+    router.push("/account");
+    location.reload();
   };
 
   if (user && Object.keys(user).length > 1) {

@@ -53,7 +53,9 @@ export const Login = () => {
               <DropdownMenu aria-label="Acoount Actions" variant="flat">
                 <DropdownItem
                   key="profile"
+                  as={Link}
                   href="/account"
+                  className="text-foreground-900"
                   startContent={
                     <User2 className="text-xl stroke-default-500 pointer-events-none flex-shrink-0" />
                   }
