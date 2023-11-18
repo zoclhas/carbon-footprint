@@ -256,3 +256,20 @@ export interface Event {
   updatedAt: string;
   createdAt: string;
 }
+
+export interface EventDetails {
+  message?: string;
+  event_data: Event;
+  classes: {
+    class_section: string;
+    activity: {
+      car: number;
+      bus: number;
+      metro: number;
+      cycle: number;
+      walk: number;
+      plane: number;
+    };
+    total_emission: number;
+  }[];
+}

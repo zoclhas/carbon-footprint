@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { EventsPage } from ".";
 
 export const metadata: Metadata = {
-  title: "Messages | CarbTrkr",
+  title: "Events | CarbTrkr",
   description: "Login in view your events.",
 };
 
