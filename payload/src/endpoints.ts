@@ -1,7 +1,7 @@
 import { Endpoint } from "payload/config";
 import path from "path";
 import payload from "payload";
-import { User } from "payload/generated-types";
+import { Log, User } from "payload/generated-types";
 
 export const endpoints: Endpoint[] = [
   {
@@ -43,50 +43,15 @@ export const endpoints: Endpoint[] = [
           });
           return;
         }
-
-        const date = new Date();
         const logs = data.docs[0].logs;
-        const todayLogs = logs.filter((log) => {
-          const timestamp = new Date(log.timestamp);
-          return timestamp >= todayStart && timestamp <= todayEnd;
-        });
-
-        let emission_stats = data.docs[0].emission_stats;
-        if (todayLogs.length === 0) {
-          emission_stats.total_emission.today = 0;
-          emission_stats.average_emission.today = 0;
-        }
-
-        const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
-        const todaysActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-        const monthsActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-        const yearsActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-
-        todayLogs.forEach(
-          (log) => (todaysActivitiesEmission[log.activity] += log.emission)
-        );
-
-        const month = date.getMonth() + 1;
-        const monthLogs = logs.filter(
-          (log) => log.timestamp.split("-")[1] === String(month)
-        );
-        monthLogs.forEach(
-          (log) => (monthsActivitiesEmission[log.activity] += log.emission)
-        );
-
-        const year = date.getFullYear();
-        const yearLogs = logs.filter(
-          (log) => log.timestamp.split("-")[0] === String(year)
-        );
-        yearLogs.forEach(
-          (log) => (yearsActivitiesEmission[log.activity] += log.emission)
-        );
+        let emissionStats = data.docs[0].emission_stats;
+        const {
+          todayLogs,
+          todaysActivitiesEmission,
+          monthsActivitiesEmission,
+          yearsActivitiesEmission,
+          emission_stats,
+        } = calculateEmissionStats(logs, emissionStats);
 
         const roles = user.roles;
 
@@ -369,13 +334,13 @@ export const endpoints: Endpoint[] = [
         const yearsEmission = { total: 0, count: 0 };
 
         const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
-        const todaysActivitiesEmission = Object.fromEntries(
+        let todaysActivitiesEmission = Object.fromEntries(
           activities.map((activity) => [activity, 0])
         );
-        const monthsActivitiesEmission = Object.fromEntries(
+        let monthsActivitiesEmission = Object.fromEntries(
           activities.map((activity) => [activity, 0])
         );
-        const yearsActivitiesEmission = Object.fromEntries(
+        let yearsActivitiesEmission = Object.fromEntries(
           activities.map((activity) => [activity, 0])
         );
 
@@ -395,42 +360,17 @@ export const endpoints: Endpoint[] = [
             },
           });
           const studentLogs = studentData.docs[0].logs;
-          const date = new Date();
-
-          const todayStart = new Date(date.setHours(0, 0, 0, 0));
-          const todayEnd = new Date(date.setHours(23, 59, 59, 999));
-          const todayLogs = studentLogs.filter((log) => {
-            const timestamp = new Date(log.timestamp);
-            return timestamp >= todayStart && timestamp <= todayEnd;
-          });
-          const studentTodaysEmission = Number(
-            todayLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
-          );
-          todayLogs.forEach(
-            (log) => (todaysActivitiesEmission[log.activity] += log.emission)
-          );
-
-          const month = date.getMonth() + 1;
-          const monthLogs = studentLogs.filter(
-            (log) => log.timestamp.split("-")[1] === String(month)
-          );
-          const studentMonthsEmission = Number(
-            monthLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
-          );
-          monthLogs.forEach(
-            (log) => (monthsActivitiesEmission[log.activity] += log.emission)
-          );
-
-          const year = date.getFullYear();
-          const yearLogs = studentLogs.filter(
-            (log) => log.timestamp.split("-")[0] === String(year)
-          );
-          const studentYearsEmission = Number(
-            yearLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
-          );
-          yearLogs.forEach(
-            (log) => (yearsActivitiesEmission[log.activity] += log.emission)
-          );
+          let {
+            todayLogs,
+            monthLogs,
+            yearLogs,
+            studentTodaysEmission,
+            studentMonthsEmission,
+            studentYearsEmission,
+            todaysActivitiesEmission: todaysAE,
+            monthsActivitiesEmission: monthsAE,
+            yearsActivitiesEmission: yearsAE,
+          } = calculateStudentsEmissionStats(studentLogs);
 
           todaysEmission.total += studentTodaysEmission;
           todaysEmission.count += todayLogs.length;
@@ -442,6 +382,19 @@ export const endpoints: Endpoint[] = [
           monthsEmission.count += monthLogs.length;
           yearsEmission.total += studentYearsEmission;
           yearsEmission.count += yearLogs.length;
+
+          todaysActivitiesEmission = calculateActivity(
+            todaysActivitiesEmission,
+            todaysAE
+          );
+          monthsActivitiesEmission = calculateActivity(
+            monthsActivitiesEmission,
+            monthsAE
+          );
+          yearsActivitiesEmission = calculateActivity(
+            yearsActivitiesEmission,
+            yearsAE
+          );
         }
 
         const studentWithHighestEmission = studentEmissions.reduce(
@@ -581,53 +534,16 @@ export const endpoints: Endpoint[] = [
           },
         });
 
-        const date = new Date();
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
         const logs = data.docs[0].logs;
-        const todayLogs = logs.filter((log) => {
-          const timestamp = new Date(log.timestamp);
-          return timestamp >= todayStart && timestamp <= todayEnd;
-        });
+        let emissionStats = data.docs[0].emission_stats;
 
-        let emission_stats = data.docs[0].emission_stats;
-        if (todayLogs.length === 0) {
-          emission_stats.total_emission.today = 0;
-          emission_stats.average_emission.today = 0;
-        }
-
-        const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
-        const todaysActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-        const monthsActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-        const yearsActivitiesEmission = Object.fromEntries(
-          activities.map((activity) => [activity, 0])
-        );
-
-        todayLogs.forEach(
-          (log) => (todaysActivitiesEmission[log.activity] += log.emission)
-        );
-
-        const month = date.getMonth() + 1;
-        const monthLogs = logs.filter(
-          (log) => log.timestamp.split("-")[1] === String(month)
-        );
-        monthLogs.forEach(
-          (log) => (monthsActivitiesEmission[log.activity] += log.emission)
-        );
-
-        const year = date.getFullYear();
-        const yearLogs = logs.filter(
-          (log) => log.timestamp.split("-")[0] === String(year)
-        );
-        yearLogs.forEach(
-          (log) => (yearsActivitiesEmission[log.activity] += log.emission)
-        );
+        const {
+          todayLogs,
+          todaysActivitiesEmission,
+          monthsActivitiesEmission,
+          yearsActivitiesEmission,
+          emission_stats,
+        } = calculateEmissionStats(logs, emissionStats);
 
         res.status(200).json({
           emission_stats,
@@ -929,3 +845,181 @@ export const endpoints: Endpoint[] = [
     },
   },
 ];
+
+function calculateEmissionStats(logs: Log[], emissionStats = null) {
+  const date = new Date();
+  const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
+
+  const todaysActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+  const monthsActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+  const yearsActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+
+  const todayStart = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+  const todayEnd = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + 1
+  );
+
+  const todayLogs = logs.filter((log) => {
+    const timestamp = new Date(log.timestamp);
+    return timestamp >= todayStart && timestamp <= todayEnd;
+  });
+
+  todayLogs.forEach(
+    (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const month = date.getMonth() + 1;
+  const monthLogs = logs.filter(
+    (log) => log.timestamp.split("-")[1] === String(month)
+  );
+  monthLogs.forEach(
+    (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const year = date.getFullYear();
+  const yearLogs = logs.filter(
+    (log) => log.timestamp.split("-")[0] === String(year)
+  );
+  yearLogs.forEach(
+    (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const result = {
+    todayLogs,
+    monthLogs,
+    yearLogs,
+    todaysActivitiesEmission,
+    monthsActivitiesEmission,
+    yearsActivitiesEmission,
+    emission_stats: null,
+  };
+
+  if (emissionStats) {
+    let emission_stats = emissionStats;
+    if (todayLogs.length === 0) {
+      emission_stats.total_emission.today = 0;
+      emission_stats.average_emission.today = 0;
+    }
+
+    result.emission_stats = emissionStats;
+  }
+
+  return result;
+}
+
+function calculateStudentsEmissionStats(logs: Log[], emissionStats = null) {
+  const date = new Date();
+  const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
+
+  const todaysActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+  const monthsActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+  const yearsActivitiesEmission = Object.fromEntries(
+    activities.map((activity) => [activity, 0])
+  );
+
+  const todayStart = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+  const todayEnd = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + 1
+  );
+
+  const todayLogs = logs.filter((log) => {
+    const timestamp = new Date(log.timestamp);
+    return timestamp >= todayStart && timestamp <= todayEnd;
+  });
+
+  todayLogs.forEach(
+    (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const month = date.getMonth() + 1;
+  const monthLogs = logs.filter(
+    (log) => log.timestamp.split("-")[1] === String(month)
+  );
+  monthLogs.forEach(
+    (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const year = date.getFullYear();
+  const yearLogs = logs.filter(
+    (log) => log.timestamp.split("-")[0] === String(year)
+  );
+  yearLogs.forEach(
+    (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const studentTodaysEmission = Number(
+    todayLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
+  );
+  todayLogs.forEach(
+    (log) => (todaysActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const studentMonthsEmission = Number(
+    monthLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
+  );
+  monthLogs.forEach(
+    (log) => (monthsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const studentYearsEmission = Number(
+    yearLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
+  );
+  yearLogs.forEach(
+    (log) => (yearsActivitiesEmission[log.activity] += log.emission)
+  );
+
+  const result = {
+    todayLogs,
+    monthLogs,
+    yearLogs,
+    todaysActivitiesEmission,
+    monthsActivitiesEmission,
+    yearsActivitiesEmission,
+    studentTodaysEmission,
+    studentMonthsEmission,
+    studentYearsEmission,
+    emission_stats: null,
+  };
+
+  if (emissionStats) {
+    let emission_stats = emissionStats;
+    if (todayLogs.length === 0) {
+      emission_stats.total_emission.today = 0;
+      emission_stats.average_emission.today = 0;
+    }
+
+    result.emission_stats = emissionStats;
+  }
+
+  return result;
+}
+
+function calculateActivity(obj1, obj2) {
+  let result = {};
+  Object.keys(obj1).forEach((key) => {
+    result[key] = (obj1[key] || 0) + (obj2[key] || 0);
+  });
+  return result;
+}
