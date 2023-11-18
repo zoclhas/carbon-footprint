@@ -78,7 +78,7 @@ export const Form = () => {
 
       // @ts-ignore
       setCookie("user", JSON.stringify(loginUser), {
-        maxAge: 2650000,
+        maxAge: 30 * 24 * 60 * 60,
       });
 
       router.push("/account");

@@ -42,14 +42,10 @@ export const Form = () => {
       }
     }
     const userData: UserProps = await res.json();
-    // @ts-ignore
-    // setUser(userData);
-    setCookie("user", JSON.stringify(userData), {
-      maxAge: 2650000,
-    });
 
-    router.push("/account");
-    location.reload();
+    setCookie("user", JSON.stringify(userData), {
+      maxAge: 30 * 24 * 60 * 60,
+    });
   };
 
   if (user && Object.keys(user).length > 1) {
