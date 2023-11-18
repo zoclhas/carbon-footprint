@@ -17,6 +17,7 @@ import Messages from "./collections/Messages";
 
 import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
+import { eventsEndpoints } from "./endpoints/events";
 
 export default buildConfig({
   admin: {
@@ -78,5 +79,6 @@ export default buildConfig({
       },
     },
     ...endpoints,
+    ...eventsEndpoints,
   ],
 });

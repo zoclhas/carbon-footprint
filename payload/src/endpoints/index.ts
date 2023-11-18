@@ -1,7 +1,7 @@
 import { Endpoint } from "payload/config";
 import path from "path";
 import payload from "payload";
-import { Log, User } from "payload/generated-types";
+import { User } from "payload/generated-types";
 
 export const endpoints: Endpoint[] = [
   {
@@ -1022,4 +1022,13 @@ function calculateActivity(obj1, obj2) {
     result[key] = (obj1[key] || 0) + (obj2[key] || 0);
   });
   return result;
+}
+
+interface Log {
+  timestamp: string;
+  activity: "car" | "bus" | "metro" | "cycle" | "walk" | "plane";
+  distance: number;
+  people: number;
+  emission?: number;
+  id?: string;
 }

@@ -32,8 +32,8 @@ const Events: CollectionConfig = {
               },
             },
             {
-              name: "starts",
-              label: "Starts At",
+              name: "ends",
+              label: "Ends At",
               type: "date",
               required: true,
               admin: {
