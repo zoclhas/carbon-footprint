@@ -230,3 +230,29 @@ export interface MessageSendProps {
   message?: string;
   success?: boolean;
 }
+
+export interface Events {
+  message?: string;
+  current_upcoming: {
+    totalDocs: number;
+    docs: Event[];
+  };
+  previous: {
+    totalDocs: number;
+    docs: Event[];
+  };
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  duration: {
+    starts: string;
+    ends: string;
+  };
+  description: {
+    [k: string]: unknown;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}

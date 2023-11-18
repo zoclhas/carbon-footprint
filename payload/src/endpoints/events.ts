@@ -28,7 +28,7 @@ export const eventsEndpoints: Endpoint[] = [
             ],
           },
         });
-        const happenedEvents = await payload.find({
+        const previousEvents = await payload.find({
           collection: "events",
           where: {
             and: [
@@ -43,7 +43,7 @@ export const eventsEndpoints: Endpoint[] = [
 
         res.status(200).json({
           current_upcoming: currentOrUpcomingEvents,
-          happened: happenedEvents,
+          previous: previousEvents,
         });
       } catch (err) {
         console.error(err);

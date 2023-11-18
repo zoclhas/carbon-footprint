@@ -14,6 +14,6 @@ const config: Config = {
     extend: {},
   },
 
-  plugins: [nextui()],
+  plugins: [nextui(), require("@tailwindcss/typography")],
 };
 export default config;

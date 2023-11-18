@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { Events } from ".";
+import { EventsPage } from ".";
 
 export const metadata: Metadata = {
   title: "Messages | CarbTrkr",
-  description: "Login in view your messages.",
+  description: "Login in view your events.",
 };
 
-export default Events;
+export default EventsPage;
