@@ -658,6 +658,7 @@ export const endpoints: Endpoint[] = [
           res
             .status(403)
             .json({ message: "You arent authorised to view this." });
+          return;
         }
 
         const readMessages = await payload.find({
@@ -725,7 +726,7 @@ export const endpoints: Endpoint[] = [
           return;
         }
 
-        const updateMessage = await payload.update({
+        await payload.update({
           collection: "messages",
           where: {
             and: [
