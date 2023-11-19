@@ -22,9 +22,18 @@ export const eventsEndpoints: Endpoint[] = [
           const currentOrUpcomingEvents = await payload.find({
             collection: "events",
             where: {
-              "duration.starts": {
-                greater_than_equal: today,
-              },
+              or: [
+                {
+                  "duration.starts": {
+                    greater_than_equal: today,
+                  },
+                },
+                {
+                  "duration.ends": {
+                    greater_than_equal: today,
+                  },
+                },
+              ],
             },
           });
           const previousEvents = await payload.find({
