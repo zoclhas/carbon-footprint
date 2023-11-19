@@ -15,8 +15,13 @@ export const eventsEndpoints: Endpoint[] = [
         }
 
         const today = req.query.today;
+        console.log(today);
 
         if (today) {
+          const events = await payload.find({
+            collection: "events",
+          });
+          console.log(events);
           const currentOrUpcomingEvents = await payload.find({
             collection: "events",
             where: {
