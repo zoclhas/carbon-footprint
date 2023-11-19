@@ -17,14 +17,13 @@ export const eventsEndpoints: Endpoint[] = [
         let today = req.query.today;
 
         if (today) {
-          let today = new Date(String(req.query.today));
-          console.log(today);
+          let today = new Date(String(req.query.today)).setHours(0, 0, 0, 0);
 
           const currentOrUpcomingEvents = await payload.find({
             collection: "events",
             where: {
               "duration.starts": {
-                greater_than_equal: today.getTime(),
+                greater_than_equal: today,
               },
             },
           });
@@ -32,7 +31,7 @@ export const eventsEndpoints: Endpoint[] = [
             collection: "events",
             where: {
               "duration.ends": {
-                less_than: today.getTime(),
+                less_than: today,
               },
             },
           });
