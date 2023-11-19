@@ -7,14 +7,14 @@ export const eventsEndpoints: Endpoint[] = [
     method: "get",
     handler: async (req, res, next) => {
       try {
-        if (!req.user) {
-          res.status(402).json({
-            message: "You need to be logged in to view your events.",
-          });
-          return;
-        }
+        // if (!req.user) {
+        //   res.status(402).json({
+        //     message: "You need to be logged in to view your events.",
+        //   });
+        //   return;
+        // }
 
-        const today = new Date().setHours(0, 0, 0, 0);
+        const today = new Date(new Date().setHours(0, 0, 0, 0));
 
         const currentOrUpcomingEvents = await payload.find({
           collection: "events",
