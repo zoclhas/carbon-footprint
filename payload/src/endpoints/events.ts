@@ -7,43 +7,50 @@ export const eventsEndpoints: Endpoint[] = [
     method: "get",
     handler: async (req, res, next) => {
       try {
-        // if (!req.user) {
-        //   res.status(402).json({
-        //     message: "You need to be logged in to view your events.",
-        //   });
-        //   return;
-        // }
+        if (!req.user) {
+          res.status(402).json({
+            message: "You need to be logged in to view your events.",
+          });
+          return;
+        }
 
-        const today = new Date(new Date().setHours(0, 0, 0, 0));
+        const today = req.query.today;
 
-        const currentOrUpcomingEvents = await payload.find({
-          collection: "events",
-          where: {
-            and: [
-              {
-                "duration.starts": {
-                  greater_than_equal: today,
+        if (today) {
+          const currentOrUpcomingEvents = await payload.find({
+            collection: "events",
+            where: {
+              and: [
+                {
+                  "duration.starts": {
+                    greater_than_equal: today,
+                  },
                 },
-              },
-            ],
-          },
-        });
-        const previousEvents = await payload.find({
-          collection: "events",
-          where: {
-            and: [
-              {
-                "duration.ends": {
-                  less_than: today,
+              ],
+            },
+          });
+          const previousEvents = await payload.find({
+            collection: "events",
+            where: {
+              and: [
+                {
+                  "duration.ends": {
+                    less_than: today,
+                  },
                 },
-              },
-            ],
-          },
-        });
+              ],
+            },
+          });
 
-        res.status(200).json({
-          current_upcoming: currentOrUpcomingEvents,
-          previous: previousEvents,
+          res.status(200).json({
+            current_upcoming: currentOrUpcomingEvents,
+            previous: previousEvents,
+          });
+          return;
+        }
+
+        res.status(500).json({
+          message: "Today must be specified.",
         });
       } catch (err) {
         console.error(err);

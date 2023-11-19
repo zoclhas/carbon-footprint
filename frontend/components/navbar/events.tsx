@@ -22,10 +22,14 @@ export const EventsButton = () => {
     setMounted(true);
 
     const getEventsCount = async () => {
-      const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/my-events", {
-        method: "GET",
-        headers: headers,
-      });
+      const today = new Date().toISOString();
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API + "/api/my-events?today=" + today,
+        {
+          method: "GET",
+          headers: headers,
+        },
+      );
       const data: Events = await res.json();
 
       setEvents(data.current_upcoming.totalDocs);

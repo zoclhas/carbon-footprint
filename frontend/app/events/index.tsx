@@ -31,11 +31,15 @@ export function EventsPage() {
   };
 
   useEffect(() => {
-    const getEventsCount = async () => {
-      const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/my-events", {
-        method: "GET",
-        headers: headers,
-      });
+    const getEvents = async () => {
+      const today = new Date().toISOString();
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API + "/api/my-events?today=" + today,
+        {
+          method: "GET",
+          headers: headers,
+        },
+      );
       const data: Events = await res.json();
 
       setEvents(data);
@@ -44,7 +48,7 @@ export function EventsPage() {
 
     if (user) {
       headers.Authorization = "users API-Key " + user!.user.apiKey;
-      getEventsCount();
+      getEvents();
     }
   }, []);
 
