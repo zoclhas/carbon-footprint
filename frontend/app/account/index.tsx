@@ -19,6 +19,7 @@ import { useEffect, useState, useRef } from "react";
 import Chart from "chart.js/auto";
 import { colors } from "./[classId]";
 import { getCookie } from "cookies-next";
+import { titleWord } from "@/lib/title-str";
 
 export function Page() {
   const router = useRouter();
@@ -129,7 +130,7 @@ export function Page() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
+      <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
         <Spinner color="success" size="lg" />
       </main>
     );
@@ -137,7 +138,7 @@ export function Page() {
 
   if (todayLogs.message) {
     return (
-      <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
+      <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
         <Card className="bg-danger-50">
           <CardHeader>{todayLogs.message}</CardHeader>
         </Card>
@@ -161,9 +162,9 @@ export function Page() {
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10">
-        <section className="flex justify-between items-center max-sm:flex-wrap gap-2 max-sm:justify-end">
-          <div className="flex sm:items-center gap-2 max-sm:flex-col grow">
-            <h1 className="text-5xl grow">
+        <section className="flex items-center justify-between gap-2 max-sm:flex-wrap max-sm:justify-end">
+          <div className="flex grow gap-2 max-sm:flex-col sm:items-center">
+            <h1 className="grow text-5xl">
               Hello {todayLogs.user.user || todayLogs.user.name}
             </h1>
             {todayLogs.user.is_class_teacher && (
@@ -177,6 +178,24 @@ export function Page() {
                 >
                   <GraduationCap />
                   Go to your class
+                </Button>
+              </Tooltip>
+            )}
+            {todayLogs.user.is_supervisor && (
+              <Tooltip
+                content={titleWord(
+                  `${todayLogs.user.my_section?.section} supervisor`,
+                )}
+              >
+                <Button
+                  as={Link}
+                  href={"/section/" + todayLogs.user.my_section?.id}
+                  variant="light"
+                  color="success"
+                  className="w-max"
+                >
+                  <GraduationCap />
+                  Go to your classes
                 </Button>
               </Tooltip>
             )}
@@ -195,10 +214,10 @@ export function Page() {
         </section>
 
         <section className="mt-6">
-          <div className="flex gap-2 justify-between max-sm:flex-col sm:items-center mb-3">
-            <h1 className="font-semibold text-3xl">Today&apos;s Logs</h1>
+          <div className="mb-3 flex justify-between gap-2 max-sm:flex-col sm:items-center">
+            <h1 className="text-3xl font-semibold">Today&apos;s Logs</h1>
 
-            <div className="flex sm:gap-2 sm:items-center max-sm:flex-col">
+            <div className="flex max-sm:flex-col sm:items-center sm:gap-2">
               {!loading && (
                 <>
                   <h2>
@@ -282,13 +301,13 @@ export function Page() {
 
         {todayLogs.emission_stats && (
           <section className="mt-6">
-            <h1 className="font-semibold text-3xl">Stats</h1>
+            <h1 className="text-3xl font-semibold">Stats</h1>
 
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full mt-3">
+            <div className="mt-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               <Card className="lg:col-span-2">
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Today</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Today</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Today&apos;s Emission: </strong>
                       <span className="justify-self-start">
@@ -325,9 +344,9 @@ export function Page() {
                 </CardFooter>
               </Card>
               <Card>
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Month</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Month</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Month&apos;s Emission: </strong>
                       <span className="justify-self-start">
@@ -367,10 +386,10 @@ export function Page() {
                   </h4>
                 </CardFooter>
               </Card>
-              <Card className="lg:col-span-3 md:col-span-2">
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Year</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+              <Card className="md:col-span-2 lg:col-span-3">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Year</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Year&apos;s Emission: </strong>
                       <span className="justify-self-start">

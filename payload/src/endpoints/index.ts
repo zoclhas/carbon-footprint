@@ -111,6 +111,44 @@ export const endpoints: Endpoint[] = [
           return;
         }
 
+        if (roles.includes("supervisor")) {
+          const mySectionDocs = await payload.find({
+            collection: "supervisor",
+            where: {
+              supervisor: {
+                equals: uid,
+              },
+            },
+            depth: 0,
+          });
+
+          if (mySectionDocs.totalDocs !== 0) {
+            const mySection = mySectionDocs.docs[0];
+
+            res.status(200).json({
+              emission_stats: emission_stats,
+              logs: todayLogs,
+              activities: {
+                today: todaysActivitiesEmission,
+                month: monthsActivitiesEmission,
+                year: yearsActivitiesEmission,
+              },
+              user: {
+                is_class_teacher: false,
+                is_supervisor: true,
+                is_principal: false,
+                name: user.name,
+                roles: roles,
+                my_section: {
+                  id: mySection.id,
+                  section: mySection.section,
+                },
+              },
+            });
+            return;
+          }
+        }
+
         res.status(200).json({
           emission_stats: emission_stats,
           logs: todayLogs,
@@ -204,8 +242,8 @@ export const endpoints: Endpoint[] = [
         }
 
         const month = date.getMonth() + 1;
-        const monthLogs = newLogs.filter(
-          (log) => log.timestamp.split("-")[1] === String(month)
+        const monthLogs = newLogs.filter((log) =>
+          log.timestamp.split("-")[1].includes(String(month))
         );
         const monthsEmission = Number(
           monthLogs.reduce((total, log) => total + log.emission, 0).toFixed(2)
@@ -882,8 +920,8 @@ function calculateEmissionStats(logs: Log[], emissionStats = null) {
   );
 
   const month = date.getMonth() + 1;
-  const monthLogs = logs.filter(
-    (log) => log.timestamp.split("-")[1] === String(month)
+  const monthLogs = logs.filter((log) =>
+    log.timestamp.split("-")[1].includes(String(month))
   );
   monthLogs.forEach(
     (log) => (monthsActivitiesEmission[log.activity] += log.emission)
@@ -955,8 +993,8 @@ function calculateStudentsEmissionStats(logs: Log[], emissionStats = null) {
   );
 
   const month = date.getMonth() + 1;
-  const monthLogs = logs.filter(
-    (log) => log.timestamp.split("-")[1] === String(month)
+  const monthLogs = logs.filter((log) =>
+    log.timestamp.split("-")[1].includes(String(month))
   );
   monthLogs.forEach(
     (log) => (monthsActivitiesEmission[log.activity] += log.emission)

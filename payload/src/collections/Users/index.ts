@@ -73,6 +73,10 @@ const Users: CollectionConfig = {
           value: "principal",
         },
         {
+          label: "supervisor",
+          value: "supervisor",
+        },
+        {
           label: "teacher",
           value: "teacher",
         },

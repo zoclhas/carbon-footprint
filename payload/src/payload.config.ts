@@ -12,6 +12,7 @@ import Users from "./collections/Users";
 import Media from "./collections/Media";
 import Footprint from "./collections/Footprint";
 import ClassSections from "./collections/Classses";
+import Supervisor from "./collections/supervisor";
 import Events from "./collections/Events";
 import Messages from "./collections/Messages";
 
@@ -25,7 +26,15 @@ export default buildConfig({
     bundler: webpackBundler(),
   },
   editor: slateEditor(slateOptions),
-  collections: [Users, Footprint, ClassSections, Events, Messages, Media],
+  collections: [
+    Users,
+    Footprint,
+    ClassSections,
+    Supervisor,
+    Events,
+    Messages,
+    Media,
+  ],
   typescript: {
     outputFile: path.resolve(__dirname, "payload-types.ts"),
   },

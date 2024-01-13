@@ -11,6 +11,7 @@ export interface Config {
     users: User;
     footprint: Footprint;
     classes: Class;
+    supervisor: Supervisor;
     events: Event;
     messages: Message;
     media: Media;
@@ -22,7 +23,7 @@ export interface Config {
 export interface User {
   id: string;
   name: string;
-  roles?: ('admin' | 'principal' | 'teacher' | 'user')[] | null;
+  roles?: ('admin' | 'principal' | 'supervisor' | 'teacher' | 'user')[] | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -76,6 +77,14 @@ export interface Class {
   updatedAt: string;
   createdAt: string;
 }
+export interface Supervisor {
+  id: string;
+  supervisor: string | User;
+  section: 'primary' | 'middle' | 'senior';
+  classes: (string | Class)[];
+  updatedAt: string;
+  createdAt: string;
+}
 export interface Event {
   id: string;
   title: string;
@@ -86,6 +95,7 @@ export interface Event {
   description: {
     [k: string]: unknown;
   }[];
+  send_mail: boolean;
   updatedAt: string;
   createdAt: string;
 }

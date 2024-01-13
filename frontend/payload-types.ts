@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   name: string;
-  roles?: ("admin" | "user" | "teacher" | "principal")[] | null;
+  roles?: ("admin" | "user" | "teacher" | "supervisor" | "principal")[] | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -118,11 +118,13 @@ export interface TodayLogsProps {
   message?: string;
   user: {
     is_class_teacher: boolean;
+    is_supervisor: boolean;
     is_principal: boolean;
     name: string;
     user: string;
     roles: ("admin" | "user" | "teacher" | "principal")[];
     my_class?: { id: string; class_section: string };
+    my_section?: { id: string; section: string };
   };
 }
 
