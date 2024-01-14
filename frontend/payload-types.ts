@@ -166,6 +166,7 @@ export interface MyClassProps {
   };
   emissions_stats: EmissionsStats;
   message?: string;
+  send_message?: boolean;
 }
 
 interface EmissionsStats {

@@ -1,6 +1,11 @@
 "use client";
 
-import { UserProps, MyClassProps, Activities } from "@/payload-types";
+import {
+  UserProps,
+  MyClassProps,
+  Activities,
+  MessageSendProps,
+} from "@/payload-types";
 import {
   Chip,
   Divider,
@@ -18,9 +23,17 @@ import {
   CardHeader,
   CardBody,
   CardFooter,
+  Tooltip,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Textarea,
+  ModalFooter,
 } from "@nextui-org/react";
 import Chart from "chart.js/auto";
-import { Eye, PieChart, Users2 } from "lucide-react";
+import { Eye, PieChart, Send, Users2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { getCookie } from "cookies-next";
 
@@ -44,6 +57,7 @@ export function MyClass({
   classId: string;
   tab: "students" | "stats";
 }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(true);
   //@ts-ignore
   const [classDetails, setClassDetails] = useState<MyClassProps>({});
@@ -154,6 +168,33 @@ export function MyClass({
     setCurrTab(tab);
   }, [tab]);
 
+  const [msgLoading, setMsgLoading] = useState<boolean>(false);
+  const [msgData, setMsgData] = useState<MessageSendProps>({});
+
+  const sendMessage = async (formData: FormData, onClose: () => void) => {
+    setMsgLoading(true);
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "users API-Key " + user!.user.apiKey);
+    const message = formData.get("message")!;
+
+    const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/send-message", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        stud_id: classDetails.class_teacher.id,
+        message,
+      }),
+    });
+    const data: MessageSendProps = await res.json();
+    setMsgData(data);
+    setMsgLoading(false);
+
+    if (data.success) {
+      setTimeout(() => onClose(), 1000);
+    }
+  };
+
   if (loading) {
     return (
       <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
@@ -203,6 +244,66 @@ export function MyClass({
               >
                 {classDetails.class_teacher.name}
               </Chip>
+              {classDetails.send_message ? (
+                <>
+                  <Tooltip content="Send Message">
+                    <Button
+                      variant="flat"
+                      color="warning"
+                      startContent={<Send />}
+                      isIconOnly
+                      onPress={onOpen}
+                    />
+                  </Tooltip>
+                  <Modal
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    backdrop="blur"
+                  >
+                    <ModalContent>
+                      {(onClose) => (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            sendMessage(new FormData(e.currentTarget), onClose);
+                          }}
+                        >
+                          {!msgLoading && msgData.success && (
+                            <ModalHeader>Sent Message!</ModalHeader>
+                          )}
+                          {!msgData.message && !msgData.success && (
+                            <>
+                              <ModalHeader>
+                                Send message to{" "}
+                                {classDetails.class_teacher.name}
+                              </ModalHeader>
+                              <ModalBody>
+                                <Textarea
+                                  name="message"
+                                  isRequired
+                                  label="Message"
+                                  isDisabled={msgLoading}
+                                />
+                              </ModalBody>
+                              <ModalFooter className="flex justify-end">
+                                <Button
+                                  type="submit"
+                                  variant="flat"
+                                  color="success"
+                                  isLoading={msgLoading}
+                                  startContent={!msgLoading && <Send />}
+                                >
+                                  Send
+                                </Button>
+                              </ModalFooter>
+                            </>
+                          )}
+                        </form>
+                      )}
+                    </ModalContent>
+                  </Modal>
+                </>
+              ) : null}
             </h2>
           </div>
 

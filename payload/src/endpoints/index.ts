@@ -472,6 +472,7 @@ export const endpoints: Endpoint[] = [
               activties: yearsActivitiesEmission,
             },
           },
+          send_message: true,
         });
       } catch (err) {
         console.error(err);
@@ -888,12 +889,19 @@ export const endpoints: Endpoint[] = [
           id: body.stud_id,
         });
 
+        const message = `New message from <b>${
+          roles.includes("supervisor")
+            ? "Supervisor"
+            : roles.includes("principal")
+            ? "Principal"
+            : roles[0]
+        }</b>:<br />${body.message}`;
         await payload.create({
           collection: "messages",
           data: {
             from: user.id,
             to: toUser.id,
-            message: body.message,
+            message: message,
           },
           user,
           depth: 0,
