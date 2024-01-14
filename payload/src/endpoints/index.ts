@@ -885,7 +885,7 @@ export const endpoints: Endpoint[] = [
   },
 ];
 
-function calculateEmissionStats(logs: Log[], emissionStats = null) {
+export function calculateEmissionStats(logs: Log[], emissionStats = null) {
   const date = new Date();
   const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
 
@@ -958,7 +958,10 @@ function calculateEmissionStats(logs: Log[], emissionStats = null) {
   return result;
 }
 
-function calculateStudentsEmissionStats(logs: Log[], emissionStats = null) {
+export function calculateStudentsEmissionStats(
+  logs: Log[],
+  emissionStats = null
+) {
   const date = new Date();
   const activities = ["car", "bus", "metro", "cycle", "walk", "plane"];
 
@@ -1055,7 +1058,7 @@ function calculateStudentsEmissionStats(logs: Log[], emissionStats = null) {
   return result;
 }
 
-function calculateActivity(obj1, obj2) {
+export function calculateActivity(obj1, obj2) {
   let result = {};
   Object.keys(obj1).forEach((key) => {
     result[key] = (obj1[key] || 0) + (obj2[key] || 0);
@@ -1063,7 +1066,7 @@ function calculateActivity(obj1, obj2) {
   return result;
 }
 
-interface Log {
+export interface Log {
   timestamp: string;
   activity: "car" | "bus" | "metro" | "cycle" | "walk" | "plane";
   distance: number;

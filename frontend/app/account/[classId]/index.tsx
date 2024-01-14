@@ -21,7 +21,6 @@ import {
 } from "@nextui-org/react";
 import Chart from "chart.js/auto";
 import { Eye, PieChart, Users2 } from "lucide-react";
-import { notFound, redirect } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { getCookie } from "cookies-next";
 
@@ -157,7 +156,7 @@ export function MyClass({
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
+      <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
         <Spinner color="success" size="lg" />
       </main>
     );
@@ -165,7 +164,7 @@ export function MyClass({
 
   if (classDetails.message) {
     return (
-      <main className="mx-auto max-w-7xl p-5 pt-10 flex justify-center min-h-[50vh] items-center">
+      <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
         <Card className="bg-danger-50">
           <CardHeader>{classDetails.message}</CardHeader>
         </Card>
@@ -186,12 +185,12 @@ export function MyClass({
 
     return (
       <main className="mx-auto max-w-7xl p-5 pt-10">
-        <section className="flex md:flex-row flex-col justify-between gap-4 md:items-center">
+        <section className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h1 className="text-5xl font-semibold">
               {classDetails.class_section}
             </h1>
-            <h2 className="sm:text-3xl text-xl font-medium flex items-center gap-1 flex-wrap">
+            <h2 className="flex flex-wrap items-center gap-1 text-xl font-medium sm:text-3xl">
               Class Teacher:{" "}
               <Chip
                 variant="flat"
@@ -200,7 +199,7 @@ export function MyClass({
                     ? "success"
                     : "warning"
                 }
-                className="sm:text-3xl text-xl h-full"
+                className="h-full text-xl sm:text-3xl"
               >
                 {classDetails.class_teacher.name}
               </Chip>
@@ -208,20 +207,20 @@ export function MyClass({
           </div>
 
           <div className="flex flex-col sm:justify-center">
-            <h3 className="sm:grid grid-cols-2 gap-1 w-full sm:place-items-end">
+            <h3 className="w-full grid-cols-2 gap-1 sm:grid sm:place-items-end">
               <strong>Total Students:</strong>{" "}
               <span className="justify-self-start">
                 {classDetails.students.length}
               </span>
             </h3>
-            <h3 className="sm:grid grid-cols-2 gap-1 w-full sm:place-items-end">
+            <h3 className="w-full grid-cols-2 gap-1 sm:grid sm:place-items-end">
               <strong>Today&apos;s Emission: </strong>
               <span className="justify-self-start">
                 {classDetails.emissions_stats.todays_emission.total} kg of CO
                 <sub>2</sub>
               </span>
             </h3>
-            <h3 className="sm:grid grid-cols-2 gap-1 w-full sm:place-items-end">
+            <h3 className="w-full grid-cols-2 gap-1 sm:grid sm:place-items-end">
               <strong>Today&apos;s Avg Emission: </strong>
               <span className="justify-self-start">
                 {classDetails.emissions_stats.todays_emission.avg} kg of CO
@@ -287,7 +286,7 @@ export function MyClass({
         ) : (
           <section className="mt-4">
             <h1 className="text-3xl font-medium">Stats</h1>
-            <Card className="mt-2 bg-warning-50">
+            <Card className="bg-warning-50 mt-2">
               <CardHeader>
                 <h2 className="text-xl font-semibold">
                   <strong>
@@ -303,11 +302,11 @@ export function MyClass({
               </CardHeader>
             </Card>
 
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full mt-8">
+            <div className="mt-8 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               <Card className="lg:col-span-2">
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Today</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Today</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Today&apos;s Emission: </strong>
                       <span className="justify-self-start">
@@ -345,9 +344,9 @@ export function MyClass({
                 </CardFooter>
               </Card>
               <Card>
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Month</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Month</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Month&apos;s Emission: </strong>
                       <span className="justify-self-start">
@@ -388,10 +387,10 @@ export function MyClass({
                   </h4>
                 </CardFooter>
               </Card>
-              <Card className="lg:col-span-3 md:col-span-2">
-                <CardHeader className="text-lg font-medium flex max-sm:flex-col justify-between gap-2 sm:items-center">
-                  <h3 className="max-md:w-full font-semibold">Year</h3>
-                  <div className="flex max-md:flex-col sm:gap-4 text-base">
+              <Card className="md:col-span-2 lg:col-span-3">
+                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                  <h3 className="font-semibold max-md:w-full">Year</h3>
+                  <div className="flex text-base max-md:flex-col sm:gap-4">
                     <h3>
                       <strong>Year&apos;s Emission: </strong>
                       <span className="justify-self-start">

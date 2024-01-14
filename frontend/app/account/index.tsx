@@ -189,7 +189,7 @@ export function Page() {
               >
                 <Button
                   as={Link}
-                  href={"/section/" + todayLogs.user.my_section?.id}
+                  href={"/account/section/" + todayLogs.user.my_section?.id}
                   variant="light"
                   color="success"
                   className="w-max"

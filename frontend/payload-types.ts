@@ -275,3 +275,9 @@ export interface EventDetails {
     total_emission: number;
   }[];
 }
+
+export interface MySectionProps {
+  id: string;
+  supervisor: User;
+  section: string;
+}
