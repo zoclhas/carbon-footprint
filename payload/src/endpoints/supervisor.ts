@@ -21,7 +21,6 @@ export const supervisorEndpoints: Endpoint[] = [
         const uid = user.id;
 
         const access = checkRole(["principal", "supervisor"], user);
-        console.log(access);
         if (!access) {
           res.status(403).json({
             message: "Unauthorised.",

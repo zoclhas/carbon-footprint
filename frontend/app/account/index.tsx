@@ -199,6 +199,20 @@ export function Page() {
                 </Button>
               </Tooltip>
             )}
+            {todayLogs.user.is_principal && (
+              <Tooltip content="Go to sections">
+                <Button
+                  as={Link}
+                  href="/account/section/"
+                  variant="light"
+                  color="success"
+                  className="w-max"
+                >
+                  <GraduationCap />
+                  Go to your sections
+                </Button>
+              </Tooltip>
+            )}
           </div>
 
           <Button

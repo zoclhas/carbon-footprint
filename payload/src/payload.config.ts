@@ -20,6 +20,7 @@ import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
 import { eventsEndpoints } from "./endpoints/events";
 import { supervisorEndpoints } from "./endpoints/supervisor";
+import { principalEndpoints } from "./endpoints/principal";
 
 export default buildConfig({
   admin: {
@@ -91,5 +92,6 @@ export default buildConfig({
     ...endpoints,
     ...eventsEndpoints,
     ...supervisorEndpoints,
+    ...principalEndpoints,
   ],
 });

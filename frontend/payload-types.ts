@@ -294,3 +294,13 @@ export interface MySectionProps {
   message?: string;
   send_message?: boolean;
 }
+
+export interface SectionsProps {
+  sections: MySectionProps[];
+  emissions_stats: {
+    today: Emissions;
+    month: Emissions;
+    year: Emissions;
+  };
+  message?: string;
+}

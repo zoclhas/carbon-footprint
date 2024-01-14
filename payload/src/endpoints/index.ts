@@ -2,6 +2,7 @@ import { Endpoint } from "payload/config";
 import path from "path";
 import payload from "payload";
 import { User } from "payload/generated-types";
+import { checkRole } from "../collections/Users/checkRole";
 
 export const endpoints: Endpoint[] = [
   {
@@ -159,7 +160,7 @@ export const endpoints: Endpoint[] = [
           },
           user: {
             is_class_teacher: false,
-            is_principal: false,
+            is_principal: roles.includes("principal"),
             name: user.name,
             roles: roles,
           },
@@ -889,13 +890,16 @@ export const endpoints: Endpoint[] = [
           id: body.stud_id,
         });
 
-        const message = `New message from <b>${
-          roles.includes("supervisor")
-            ? "Supervisor"
-            : roles.includes("principal")
-            ? "Principal"
-            : roles[0]
-        }</b>:<br />${body.message}`;
+        const access = checkRole(["supervisor", "principal"], user);
+        const message = access
+          ? `New message from <b>${
+              roles.includes("supervisor")
+                ? "Supervisor"
+                : roles.includes("principal")
+                ? "Principal"
+                : roles[0]
+            }</b>:<br />${body.message}`
+          : body.message;
         await payload.create({
           collection: "messages",
           data: {
