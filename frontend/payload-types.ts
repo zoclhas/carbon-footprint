@@ -292,4 +292,5 @@ export interface MySectionProps {
     year: Emissions;
   };
   message?: string;
+  send_message?: boolean;
 }

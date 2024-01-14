@@ -1,7 +1,12 @@
 "use client";
 
 import { titleWord } from "@/lib/title-str";
-import { Activities, MySectionProps, UserProps } from "@/payload-types";
+import {
+  Activities,
+  MessageSendProps,
+  MySectionProps,
+  UserProps,
+} from "@/payload-types";
 import {
   Accordion,
   AccordionItem,
@@ -13,6 +18,11 @@ import {
   CardHeader,
   Chip,
   Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Spinner,
   Table,
   TableBody,
@@ -20,9 +30,12 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Textarea,
+  Tooltip,
+  useDisclosure,
 } from "@nextui-org/react";
 import { getCookie } from "cookies-next";
-import { Eye, PieChart, Users2 } from "lucide-react";
+import { Eye, PieChart, Send, Users2 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -30,6 +43,7 @@ import { colors } from "../../[classId]";
 import { Chart } from "chart.js";
 
 export default function SectionPage({ sectionId }: { sectionId: string }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [sectionDetails, setSectionDetails] = useState<MySectionProps | null>(
     null,
@@ -140,6 +154,33 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
     }
   }, [currTab, sectionDetails]);
 
+  const [msgLoading, setMsgLoading] = useState<boolean>(false);
+  const [msgData, setMsgData] = useState<MessageSendProps>({});
+
+  const sendMessage = async (formData: FormData, onClose: () => void) => {
+    setMsgLoading(true);
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "users API-Key " + user!.user.apiKey);
+    const message = formData.get("message")!;
+
+    const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/send-message", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        stud_id: sectionDetails?.my_section.supervisor.id,
+        message,
+      }),
+    });
+    const data: MessageSendProps = await res.json();
+    setMsgData(data);
+    setMsgLoading(false);
+
+    if (data.success) {
+      setTimeout(() => onClose(), 1000);
+    }
+  };
+
   if (loading) {
     return (
       <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center p-5 pt-10">
@@ -189,6 +230,66 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
               >
                 {sectionDetails.my_section.supervisor.name}
               </Chip>
+              {sectionDetails.send_message ? (
+                <>
+                  <Tooltip content="Send Message">
+                    <Button
+                      variant="flat"
+                      color="warning"
+                      startContent={<Send />}
+                      isIconOnly
+                      onPress={onOpen}
+                    />
+                  </Tooltip>
+                  <Modal
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    backdrop="blur"
+                  >
+                    <ModalContent>
+                      {(onClose) => (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            sendMessage(new FormData(e.currentTarget), onClose);
+                          }}
+                        >
+                          {!msgLoading && msgData.success && (
+                            <ModalHeader>Sent Message!</ModalHeader>
+                          )}
+                          {!msgData.message && !msgData.success && (
+                            <>
+                              <ModalHeader>
+                                Send message to{" "}
+                                {sectionDetails.my_section.supervisor.name}
+                              </ModalHeader>
+                              <ModalBody>
+                                <Textarea
+                                  name="message"
+                                  isRequired
+                                  label="Message"
+                                  isDisabled={msgLoading}
+                                />
+                              </ModalBody>
+                              <ModalFooter className="flex justify-end">
+                                <Button
+                                  type="submit"
+                                  variant="flat"
+                                  color="success"
+                                  isLoading={msgLoading}
+                                  startContent={!msgLoading && <Send />}
+                                >
+                                  Send
+                                </Button>
+                              </ModalFooter>
+                            </>
+                          )}
+                        </form>
+                      )}
+                    </ModalContent>
+                  </Modal>
+                </>
+              ) : null}
             </h2>
           </div>
 

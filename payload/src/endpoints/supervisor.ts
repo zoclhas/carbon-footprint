@@ -2,6 +2,7 @@ import payload from "payload";
 import { Endpoint } from "payload/config";
 import { Class, User } from "payload/generated-types";
 import { calculateActivity, calculateStudentsEmissionStats } from ".";
+import { checkRole } from "../collections/Users/checkRole";
 
 export const supervisorEndpoints: Endpoint[] = [
   {
@@ -19,35 +20,59 @@ export const supervisorEndpoints: Endpoint[] = [
         const user: User = req.user;
         const uid = user.id;
 
-        if (!user.roles.includes("supervisor")) {
+        const access = checkRole(["principal", "supervisor"], user);
+        console.log(access);
+        if (!access) {
           res.status(403).json({
             message: "Unauthorised.",
           });
           return;
         }
 
-        const mySectionDocs = await payload.find({
-          collection: "supervisor",
-          where: {
-            and: [
-              {
-                supervisor: {
-                  equals: uid,
+        let mySectionDocs;
+        if (user.roles.includes("principal")) {
+          mySectionDocs = await payload.find({
+            collection: "supervisor",
+            where: {
+              and: [
+                {
+                  id: {
+                    equals: String(req.body.section_id),
+                  },
                 },
-              },
-              {
-                id: {
-                  equals: String(req.body.section_id),
-                },
-              },
-            ],
-          },
-        });
-        if (mySectionDocs.totalDocs === 0) {
-          res.status(403).json({
-            message: "Unauthorised.",
+              ],
+            },
           });
-          return;
+          if (mySectionDocs.totalDocs === 0) {
+            res.status(404).json({
+              message: "No section found.",
+            });
+            return;
+          }
+        } else {
+          mySectionDocs = await payload.find({
+            collection: "supervisor",
+            where: {
+              and: [
+                {
+                  supervisor: {
+                    equals: uid,
+                  },
+                },
+                {
+                  id: {
+                    equals: String(req.body.section_id),
+                  },
+                },
+              ],
+            },
+          });
+          if (mySectionDocs.totalDocs === 0) {
+            res.status(403).json({
+              message: "Unauthorised.",
+            });
+            return;
+          }
         }
 
         const mySection = mySectionDocs.docs[0];
@@ -123,6 +148,7 @@ export const supervisorEndpoints: Endpoint[] = [
         res.status(200).json({
           my_section: mySection,
           emissions_stats: emissionStats,
+          send_message: checkRole(["principal"], user),
         });
       } catch (err) {
         console.error(err);
