@@ -155,7 +155,9 @@ export interface Log {
 }
 
 export interface MyClassProps {
+  id: string;
   class_section: string;
+  combined_class_section: string;
   class_teacher: User;
   students: User[];
   student_with_highest_emission: {
@@ -277,7 +279,16 @@ export interface EventDetails {
 }
 
 export interface MySectionProps {
-  id: string;
-  supervisor: User;
-  section: string;
+  my_section: {
+    id: string;
+    supervisor: User;
+    section: string;
+    classes: MyClassProps[];
+  };
+  emissions_stats: {
+    today: Emissions;
+    month: Emissions;
+    year: Emissions;
+  };
+  message?: string;
 }

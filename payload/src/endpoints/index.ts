@@ -323,7 +323,7 @@ export const endpoints: Endpoint[] = [
         const roles = user.roles;
 
         let classData;
-        if (roles.includes("principal") || roles.includes("admin")) {
+        if (roles.includes("principal") || roles.includes("supervisor")) {
           classData = await payload.find({
             collection: "classes",
             where: {
@@ -497,7 +497,7 @@ export const endpoints: Endpoint[] = [
 
         const uid = user.id;
         const roles = user.roles;
-        const access_roles = ["admin", "teacher", "principal"];
+        const access_roles = ["admin", "teacher", "principal", "supervisor"];
 
         if (!roles.some((element) => access_roles.includes(element))) {
           res.status(403).json({
@@ -507,32 +507,56 @@ export const endpoints: Endpoint[] = [
         }
 
         if (
-          roles.includes("teacher") &&
-          !roles.some((element) => ["admin", "principal"].includes(element))
+          roles.includes("teacher") ||
+          roles.includes("supervisor") ||
+          roles.includes("principal")
         ) {
-          const checkIfTeacherIsClassTeacher = await payload.find({
-            collection: "classes",
-            where: {
-              and: [
-                {
-                  id: {
-                    equals: class_id,
+          if (roles.includes("supervisor") || roles.includes("principal")) {
+            const checkIfTeacherIsClassTeacher = await payload.find({
+              collection: "classes",
+              where: {
+                and: [
+                  {
+                    id: {
+                      equals: class_id,
+                    },
                   },
-                },
-                {
-                  class_teacher: {
-                    equals: uid,
-                  },
-                },
-              ],
-            },
-          });
-
-          if (checkIfTeacherIsClassTeacher.totalDocs === 0) {
-            res.status(403).json({
-              message: "You need to be a teacher of this class to access this.",
+                ],
+              },
             });
-            return;
+
+            if (checkIfTeacherIsClassTeacher.totalDocs === 0) {
+              res.status(404).json({
+                message: "Class doesn't exist.",
+              });
+              return;
+            }
+          } else {
+            const checkIfTeacherIsClassTeacher = await payload.find({
+              collection: "classes",
+              where: {
+                and: [
+                  {
+                    id: {
+                      equals: class_id,
+                    },
+                  },
+                  {
+                    class_teacher: {
+                      equals: uid,
+                    },
+                  },
+                ],
+              },
+            });
+
+            if (checkIfTeacherIsClassTeacher.totalDocs === 0) {
+              res.status(403).json({
+                message:
+                  "You need to be a teacher of this class to access this.",
+              });
+              return;
+            }
           }
         }
 
@@ -617,7 +641,7 @@ export const endpoints: Endpoint[] = [
         }
 
         const roles = user.roles;
-        const access_roles = ["teacher", "principal"];
+        const access_roles = ["teacher", "principal", "supervisor"];
         const showSent = roles.some((element) =>
           access_roles.includes(element)
         );
@@ -687,7 +711,7 @@ export const endpoints: Endpoint[] = [
         }
 
         const roles = user.roles;
-        const access_roles = ["teacher", "principal"];
+        const access_roles = ["teacher", "principal", "supervisor"];
         const showSent = roles.some((element) =>
           access_roles.includes(element)
         );
@@ -847,7 +871,7 @@ export const endpoints: Endpoint[] = [
         }
 
         const roles = user.roles;
-        const access_roles = ["teacher", "principal"];
+        const access_roles = ["teacher", "principal", "supervisor"];
         const sendMessageAccess = roles.some((element) =>
           access_roles.includes(element)
         );
@@ -856,6 +880,7 @@ export const endpoints: Endpoint[] = [
           res
             .status(403)
             .json({ message: "You arent authorised to send this." });
+          return;
         }
 
         const toUser = await payload.findByID({

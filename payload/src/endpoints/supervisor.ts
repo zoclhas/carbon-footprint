@@ -56,6 +56,12 @@ export const supervisorEndpoints: Endpoint[] = [
           // @ts-ignore
           getAllClassesData(mySection.classes)
         );
+        mySection.classes = mySection.classes
+          .sort((a, b) =>
+            // @ts-ignore
+            a.combined_class_section.localeCompare(b.combined_class_section)
+          )
+          .reverse();
         const emissionStats = mySection.classes.reduce(
           // @ts-ignore
           (total, c: ClassDataProps) => {
@@ -67,7 +73,7 @@ export const supervisorEndpoints: Endpoint[] = [
               total[timePeriod].avg += emissions.avg;
 
               activties.forEach((activity) => {
-                total[timePeriod].activities[activity] +=
+                total[timePeriod].activties[activity] +=
                   emissions.activties[activity];
               });
             });
@@ -78,7 +84,7 @@ export const supervisorEndpoints: Endpoint[] = [
             today: {
               total: 0,
               avg: 0,
-              activities: {
+              activties: {
                 car: 0,
                 bus: 0,
                 metro: 0,
@@ -90,7 +96,7 @@ export const supervisorEndpoints: Endpoint[] = [
             month: {
               total: 0,
               avg: 0,
-              activities: {
+              activties: {
                 car: 0,
                 bus: 0,
                 metro: 0,
@@ -102,7 +108,7 @@ export const supervisorEndpoints: Endpoint[] = [
             year: {
               total: 0,
               avg: 0,
-              activities: {
+              activties: {
                 car: 0,
                 bus: 0,
                 metro: 0,
@@ -116,7 +122,7 @@ export const supervisorEndpoints: Endpoint[] = [
 
         res.status(200).json({
           my_section: mySection,
-          emission_stats: emissionStats,
+          emissions_stats: emissionStats,
         });
       } catch (err) {
         console.error(err);
