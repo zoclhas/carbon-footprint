@@ -473,7 +473,7 @@ export const endpoints: Endpoint[] = [
               activties: yearsActivitiesEmission,
             },
           },
-          send_message: true,
+          send_message: checkRole(["supervisor", "principal"], user),
         });
       } catch (err) {
         console.error(err);
@@ -890,16 +890,7 @@ export const endpoints: Endpoint[] = [
           id: body.stud_id,
         });
 
-        const access = checkRole(["supervisor", "principal"], user);
-        const message = access
-          ? `New message from <b>${
-              roles.includes("supervisor")
-                ? "Supervisor"
-                : roles.includes("principal")
-                ? "Principal"
-                : roles[0]
-            }</b>:<br />${body.message}`
-          : body.message;
+        const message = body.message;
         await payload.create({
           collection: "messages",
           data: {

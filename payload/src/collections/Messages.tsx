@@ -64,6 +64,18 @@ export const Messages: CollectionConfig = {
         const { name: fromName } = fromUser;
         const { name: toName, email: toEmail } = toUser;
 
+        const access = checkRole(["supervisor", "principal"], fromUser);
+        const roles = fromUser.roles;
+        const extraHtml = access
+          ? `(<b>${
+              roles.includes("supervisor")
+                ? "Supervisor"
+                : roles.includes("principal")
+                ? "Principal"
+                : roles[0]
+            }</b>)`
+          : "";
+
         const mail = await payload.sendEmail({
           from: `${process.env.FROM_NAME} <${process.env.FROM_ADDRESS}>`,
           to: toEmail,
@@ -72,7 +84,7 @@ export const Messages: CollectionConfig = {
             Hello <b>${toName}</b>,
             <br />
             <br />
-            <b>${fromName}</b> has sent you a message:
+            <b>${fromName}</b> ${extraHtml} has sent you a message:
             <br />
             ${message}
             <br />
