@@ -14,6 +14,7 @@ export interface Config {
     supervisor: Supervisor;
     events: Event;
     messages: Message;
+    surverys: Survery;
     media: Media;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -105,6 +106,14 @@ export interface Message {
   to: string | User;
   message: string;
   is_read?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Survery {
+  id: string;
+  user: string | User;
+  cooking: 'non_clean' | 'clean';
+  vehicle: 'non_electric' | 'Electric';
   updatedAt: string;
   createdAt: string;
 }

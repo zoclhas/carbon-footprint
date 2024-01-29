@@ -15,12 +15,14 @@ import ClassSections from "./collections/Classses";
 import Supervisor from "./collections/supervisor";
 import Events from "./collections/Events";
 import Messages from "./collections/Messages";
+import Surverys from "./collections/Surveys";
 
 import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
 import { eventsEndpoints } from "./endpoints/events";
 import { supervisorEndpoints } from "./endpoints/supervisor";
 import { principalEndpoints } from "./endpoints/principal";
+import { surverysEndpoints } from "./endpoints/surverys";
 
 export default buildConfig({
   admin: {
@@ -35,6 +37,7 @@ export default buildConfig({
     Supervisor,
     Events,
     Messages,
+    Surverys,
     Media,
   ],
   typescript: {
@@ -93,5 +96,6 @@ export default buildConfig({
     ...eventsEndpoints,
     ...supervisorEndpoints,
     ...principalEndpoints,
+    ...surverysEndpoints,
   ],
 });

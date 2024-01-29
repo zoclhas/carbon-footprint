@@ -34,6 +34,7 @@ export const Login = () => {
 
   const removeUser = (onClose: () => void) => {
     deleteCookie("user");
+    localStorage.removeItem("survey");
     onClose();
     router.push("/login");
     location.reload();
@@ -57,7 +58,7 @@ export const Login = () => {
                   href="/account"
                   className="text-foreground-900"
                   startContent={
-                    <User2 className="text-xl stroke-default-500 pointer-events-none flex-shrink-0" />
+                    <User2 className="stroke-default-500 pointer-events-none flex-shrink-0 text-xl" />
                   }
                 >
                   Profile
@@ -65,7 +66,7 @@ export const Login = () => {
                 <DropdownItem
                   key="logout"
                   startContent={
-                    <LogOut className="text-xl stroke-default-500 pointer-events-none flex-shrink-0" />
+                    <LogOut className="stroke-default-500 pointer-events-none flex-shrink-0 text-xl" />
                   }
                   onPress={onOpen}
                 >
@@ -90,7 +91,7 @@ export const Login = () => {
             {(onClose) => (
               <>
                 <ModalHeader>
-                  <h1 className="font-medium text-xl">
+                  <h1 className="text-xl font-medium">
                     Are you sure you want to logout?
                   </h1>
                 </ModalHeader>

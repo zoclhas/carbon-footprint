@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import { Providers } from "./providers";
 import { Footer } from "@/components/footer";
+import Survey from "./survery";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </Providers>
+        <Survey />
       </body>
     </html>
   );
