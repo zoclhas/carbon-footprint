@@ -16,6 +16,8 @@ import Supervisor from "./collections/supervisor";
 import Events from "./collections/Events";
 import Messages from "./collections/Messages";
 import Surverys from "./collections/Surveys";
+import Waste from "./collections/Waste";
+import Electricity from "./collections/Electricity";
 
 import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
@@ -38,6 +40,8 @@ export default buildConfig({
     Events,
     Messages,
     Surverys,
+    Waste,
+    Electricity,
     Media,
   ],
   typescript: {

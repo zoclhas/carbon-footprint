@@ -21,6 +21,10 @@ const Surverys: CollectionConfig = {
           label: "Clean",
           value: "clean",
         },
+        {
+          label: "None",
+          value: "none",
+        },
       ],
       required: true,
     },

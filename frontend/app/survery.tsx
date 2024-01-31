@@ -19,9 +19,6 @@ export default function Survey() {
   // @ts-ignore
   const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
 
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
-
   useEffect(() => {
     const surveryCheck = async () => {
       const res = await fetch(
@@ -29,7 +26,10 @@ export default function Survey() {
         {
           method: "get",
           cache: "no-store",
-          headers: headers,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `users API-Key ${user!.user.apiKey}`,
+          },
         },
       );
 
@@ -49,7 +49,6 @@ export default function Survey() {
     };
 
     if (user) {
-      headers.append("Authorization", "users API-Key " + user!.user.apiKey);
       const survey = localStorage.getItem("survey");
       if (survey !== "true") {
         surveryCheck();
@@ -68,11 +67,12 @@ export default function Survey() {
       ["clean", "non_clean"].includes(cook) &&
       ["electric", "non_electric"].includes(vehicle)
     ) {
-      headers.append("Authorization", "users API-Key " + user!.user.apiKey);
-
       const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/set-survey", {
         method: "post",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `users API-Key ${user!.user.apiKey}`,
+        },
         body: JSON.stringify({
           cooking: cook,
           vehicle,
@@ -81,7 +81,6 @@ export default function Survey() {
       if (res.ok) {
         const data = await res.json();
         if (data.done) {
-          onOpen();
         }
       } else {
         location.reload();
@@ -121,10 +120,13 @@ export default function Survey() {
               >
                 <Radio value="electric">Electrical</Radio>
                 <Radio value="non_electric">Non Electrical</Radio>
+                <Radio value="none">None</Radio>
               </RadioGroup>
             </ModalBody>
             <ModalFooter>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" onPress={onClose}>
+                Submit
+              </Button>
             </ModalFooter>
           </>
         )}

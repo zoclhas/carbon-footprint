@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/navbar";
-import "./globals.css";
+import "./globals.scss";
 
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";

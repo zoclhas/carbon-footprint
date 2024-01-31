@@ -209,8 +209,15 @@ export const endpoints: Endpoint[] = [
     method: "post",
     handler: async (req, res, next) => {
       try {
-        const user = req.user;
-        const log: { timestamp: string; emission: number } = req.body;
+        const user: User = req.user;
+        const log: {
+          timestamp: string;
+          activity: "car" | "bus" | "metro" | "cycle" | "walk" | "plane";
+          distance: number;
+          people: number;
+          emission?: number;
+          id?: string;
+        } = req.body;
 
         const footprint = await payload.find({
           collection: "footprint",
@@ -298,6 +305,34 @@ export const endpoints: Endpoint[] = [
         });
 
         res.status(200).json(updatedFootprint.docs);
+
+        if (emission_stats.total_emission.today > 35) {
+          const highest_activity = todayLogs.sort(
+            (a, b) => (b.emission || 0) - (a.emission || 0)
+          )[0];
+
+          if (!["cycle", "walk"].includes(highest_activity.activity)) {
+            if (emission_stats.total_emission.today > 70) {
+              payload.sendEmail({
+                from: `${process.env.FROM_NAME} <${process.env.FROM_ADDRESS}>`,
+                to: user.email,
+                subject:
+                  "You have completed crossed your daily CO2 limit! Please start using cleaner means!",
+                html: `Hello ${user.name},<br/>You have crossed the threshold of 70kg of CO<sub>2</sub> per day! Please reduce your usage of ${highest_activity.activity} and choose cleaner alternatives like walking or cycling.`,
+              });
+              console.log("Sent full");
+            } else {
+              payload.sendEmail({
+                from: `${process.env.FROM_NAME} <${process.env.FROM_ADDRESS}>`,
+                to: user.email,
+                subject:
+                  "You have completed crossed your daily CO2 limit! Please start using cleaner means!",
+                html: `Hello ${user.name},<br/>You are half way through the threshold of 70kg of CO<sub>2</sub> per day! Please reduce your usage of ${highest_activity.activity} and choose cleaner alternatives like walking or cycling.`,
+              });
+              console.log("Sent half");
+            }
+          }
+        }
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Failed to fetch all logs." });

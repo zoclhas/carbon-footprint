@@ -12,6 +12,9 @@ import {
   CardBody,
   CardFooter,
   Spinner,
+  Tabs,
+  Tab,
+  ScrollShadow,
 } from "@nextui-org/react";
 import { GraduationCap, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,6 +27,7 @@ import { titleWord } from "@/lib/title-str";
 export function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"travel" | "waste" | "electricity">("travel");
   //@ts-ignore
   const [todayLogs, setTodayLogs] = useState<TodayLogsProps>({});
   // @ts-ignore
@@ -102,7 +106,7 @@ export function Page() {
     }
   }
   useEffect(() => {
-    if (Object.keys(todayLogs).length > 1) {
+    if (Object.keys(todayLogs).length > 1 && tab === "travel") {
       const todayChartCleanup = createChart(
         todayChartCanvas,
         todayLogs.activities.today,
@@ -122,7 +126,7 @@ export function Page() {
         yearChartCleanup && yearChartCleanup();
       };
     }
-  }, [todayLogs]);
+  }, [todayLogs, tab]);
 
   if (todayLogs.message === "You must be logged in") {
     router.push("/login");
@@ -227,221 +231,243 @@ export function Page() {
           </Button>
         </section>
 
-        <section className="mt-6">
-          <div className="mb-3 flex justify-between gap-2 max-sm:flex-col sm:items-center">
-            <h1 className="text-3xl font-semibold">Today&apos;s Logs</h1>
+        <Tabs
+          size="lg"
+          selectedKey={tab}
+          onSelectionChange={setTab as any}
+          className="mt-8"
+        >
+          <Tab key="travel" title="Travel">
+            <>
+              <section className="mt-6">
+                <div className="mb-3 flex justify-between gap-2 max-sm:flex-col sm:items-center">
+                  <h1 className="text-3xl font-semibold">Today&apos;s Logs</h1>
 
-            <div className="flex max-sm:flex-col sm:items-center sm:gap-2">
-              {!loading && (
-                <>
-                  <h2>
-                    <strong>Today&apos;s Emission:</strong>{" "}
-                    {todayLogs.emission_stats.total_emission.today ?? 0} kg of
-                    CO
-                    <sub>2</sub>
-                  </h2>
-                  <h2>
-                    <strong>Today&apos;s Average Emission:</strong>{" "}
-                    {todayLogs.emission_stats.average_emission.today ?? 0} kg of
-                    CO
-                    <sub>2</sub>
-                  </h2>
-                </>
+                  <div className="flex max-sm:flex-col sm:items-center sm:gap-2">
+                    {!loading && (
+                      <>
+                        <h2>
+                          <strong>Today&apos;s Emission:</strong>{" "}
+                          {todayLogs.emission_stats.total_emission.today ?? 0}{" "}
+                          kg of CO
+                          <sub>2</sub>
+                        </h2>
+                        <h2>
+                          <strong>Today&apos;s Average Emission:</strong>{" "}
+                          {todayLogs.emission_stats.average_emission.today ?? 0}{" "}
+                          kg of CO
+                          <sub>2</sub>
+                        </h2>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <ScrollShadow className="h-[420px]">
+                  {todaysLogsSort && todaysLogsSort.length > 0 && (
+                    <Accordion variant="splitted">
+                      {todaysLogsSort.map((log) => {
+                        const date = new Date(log.timestamp);
+                        const time = date.toLocaleString("en-GB", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                          hour12: true,
+                        });
+
+                        function capitalizeFirstLetter(str: string): string {
+                          return str.charAt(0).toUpperCase() + str.slice(1);
+                        }
+
+                        return (
+                          <AccordionItem key={log.id} title={time}>
+                            <ul>
+                              <li>
+                                <strong>Activity:</strong>&nbsp;
+                                <span>
+                                  {capitalizeFirstLetter(log.activity)}
+                                </span>
+                              </li>
+                              <li>
+                                <strong>Distance:</strong>&nbsp;
+                                <span>{log.distance} km</span>
+                              </li>
+                              <li>
+                                <strong>Person Count:</strong>&nbsp;
+                                <span>{log.people}</span>
+                              </li>
+                              <li>
+                                <strong>Emission:</strong>&nbsp;
+                                <span>
+                                  {log.emission} kg of CO<sub>2</sub>
+                                </span>
+                              </li>
+                            </ul>
+                          </AccordionItem>
+                        );
+                      })}
+                    </Accordion>
+                  )}
+                </ScrollShadow>
+
+                {todaysLogsSort.length === 0 && (
+                  <Card>
+                    <CardHeader>
+                      <h3>
+                        You should add some logs today! Click on{" "}
+                        <Link
+                          href="/account/add"
+                          color="success"
+                          underline="focus"
+                          isBlock
+                        >
+                          Add Log
+                        </Link>
+                      </h3>
+                    </CardHeader>
+                  </Card>
+                )}
+              </section>
+              {todayLogs.emission_stats && (
+                <section className="mt-6">
+                  <h1 className="text-3xl font-semibold">Stats</h1>
+
+                  <div className="mt-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card className="lg:col-span-2">
+                      <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                        <h3 className="font-semibold max-md:w-full">Today</h3>
+                        <div className="flex text-base max-md:flex-col sm:gap-4">
+                          <h3>
+                            <strong>Today&apos;s Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.total_emission.today} kg
+                              of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                          <h3>
+                            <strong>Today&apos;s Avg Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.average_emission.today}{" "}
+                              kg of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                        </div>
+                      </CardHeader>
+                      <CardBody>
+                        <canvas
+                          id="today-graph"
+                          ref={todayChartCanvas}
+                        ></canvas>
+                      </CardBody>
+                      <CardFooter>
+                        <h4 className="text-base">
+                          {maxTodayVal === 0 ? (
+                            <>Add logs to view highest emission</>
+                          ) : (
+                            <>
+                              <strong>Highest emission: </strong>
+                              {capitalizeFirstLetter(maxTodayKey)} produced{" "}
+                              {maxTodayVal}
+                              kg of CO<sub>2</sub>
+                            </>
+                          )}
+                        </h4>
+                      </CardFooter>
+                    </Card>
+                    <Card>
+                      <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                        <h3 className="font-semibold max-md:w-full">Month</h3>
+                        <div className="flex text-base max-md:flex-col sm:gap-4">
+                          <h3>
+                            <strong>Month&apos;s Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.total_emission.month} kg
+                              of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                          <h3>
+                            <strong>Month&apos;s Avg Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.average_emission.month}{" "}
+                              kg of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                        </div>
+                      </CardHeader>
+                      <CardBody>
+                        <canvas
+                          id="month-graph"
+                          ref={monthChartCanvas}
+                          height={298}
+                        ></canvas>
+                      </CardBody>
+                      <CardFooter>
+                        <h4 className="text-base">
+                          {maxMonthVal === 0 ? (
+                            <>Add logs to view highest emission</>
+                          ) : (
+                            <>
+                              <strong>Highest emission: </strong>
+                              {capitalizeFirstLetter(maxMonthKey)} produced{" "}
+                              {maxMonthVal}
+                              kg of CO<sub>2</sub>
+                            </>
+                          )}
+                        </h4>
+                      </CardFooter>
+                    </Card>
+                    <Card className="md:col-span-2 lg:col-span-3">
+                      <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                        <h3 className="font-semibold max-md:w-full">Year</h3>
+                        <div className="flex text-base max-md:flex-col sm:gap-4">
+                          <h3>
+                            <strong>Year&apos;s Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.total_emission.year} kg
+                              of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                          <h3>
+                            <strong>Year&apos;s Avg Emission: </strong>
+                            <span className="justify-self-start">
+                              {todayLogs.emission_stats.average_emission.year}{" "}
+                              kg of CO
+                              <sub>2</sub>
+                            </span>
+                          </h3>
+                        </div>
+                      </CardHeader>
+                      <CardBody>
+                        <canvas id="year-graph" ref={yearChartCanvas}></canvas>
+                      </CardBody>
+                      <CardFooter>
+                        <h4 className="text-base">
+                          {maxYearVal === 0 ? (
+                            <>Add logs to view highest emission</>
+                          ) : (
+                            <>
+                              <strong>Highest emission: </strong>
+                              {capitalizeFirstLetter(maxYearKey)} produced{" "}
+                              {maxYearVal}
+                              kg of CO<sub>2</sub>
+                            </>
+                          )}
+                        </h4>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                </section>
               )}
-            </div>
-          </div>
-
-          {todaysLogsSort && todaysLogsSort.length > 0 && (
-            <Accordion variant="splitted">
-              {todaysLogsSort.map((log) => {
-                const date = new Date(log.timestamp);
-                const time = date.toLocaleString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  hour12: true,
-                });
-
-                function capitalizeFirstLetter(str: string): string {
-                  return str.charAt(0).toUpperCase() + str.slice(1);
-                }
-
-                return (
-                  <AccordionItem key={log.id} title={time}>
-                    <ul>
-                      <li>
-                        <strong>Activity:</strong>&nbsp;
-                        <span>{capitalizeFirstLetter(log.activity)}</span>
-                      </li>
-                      <li>
-                        <strong>Distance:</strong>&nbsp;
-                        <span>{log.distance} km</span>
-                      </li>
-                      <li>
-                        <strong>Person Count:</strong>&nbsp;
-                        <span>{log.people}</span>
-                      </li>
-                      <li>
-                        <strong>Emission:</strong>&nbsp;
-                        <span>
-                          {log.emission} kg of CO<sub>2</sub>
-                        </span>
-                      </li>
-                    </ul>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
-          )}
-
-          {todaysLogsSort.length === 0 && (
-            <Card>
-              <CardHeader>
-                <h3>
-                  You should add some logs today! Click on{" "}
-                  <Link
-                    href="/account/add"
-                    color="success"
-                    underline="focus"
-                    isBlock
-                  >
-                    Add Log
-                  </Link>
-                </h3>
-              </CardHeader>
-            </Card>
-          )}
-        </section>
-
-        {todayLogs.emission_stats && (
-          <section className="mt-6">
-            <h1 className="text-3xl font-semibold">Stats</h1>
-
-            <div className="mt-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
-                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
-                  <h3 className="font-semibold max-md:w-full">Today</h3>
-                  <div className="flex text-base max-md:flex-col sm:gap-4">
-                    <h3>
-                      <strong>Today&apos;s Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.today} kg of CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                    <h3>
-                      <strong>Today&apos;s Avg Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.today} kg of
-                        CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <canvas id="today-graph" ref={todayChartCanvas}></canvas>
-                </CardBody>
-                <CardFooter>
-                  <h4 className="text-base">
-                    {maxTodayVal === 0 ? (
-                      <>Add logs to view highest emission</>
-                    ) : (
-                      <>
-                        <strong>Highest emission: </strong>
-                        {capitalizeFirstLetter(maxTodayKey)} produced{" "}
-                        {maxTodayVal}
-                        kg of CO<sub>2</sub>
-                      </>
-                    )}
-                  </h4>
-                </CardFooter>
-              </Card>
-              <Card>
-                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
-                  <h3 className="font-semibold max-md:w-full">Month</h3>
-                  <div className="flex text-base max-md:flex-col sm:gap-4">
-                    <h3>
-                      <strong>Month&apos;s Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.month} kg of CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                    <h3>
-                      <strong>Month&apos;s Avg Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.month} kg of
-                        CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <canvas
-                    id="month-graph"
-                    ref={monthChartCanvas}
-                    height={298}
-                  ></canvas>
-                </CardBody>
-                <CardFooter>
-                  <h4 className="text-base">
-                    {maxMonthVal === 0 ? (
-                      <>Add logs to view highest emission</>
-                    ) : (
-                      <>
-                        <strong>Highest emission: </strong>
-                        {capitalizeFirstLetter(maxMonthKey)} produced{" "}
-                        {maxMonthVal}
-                        kg of CO<sub>2</sub>
-                      </>
-                    )}
-                  </h4>
-                </CardFooter>
-              </Card>
-              <Card className="md:col-span-2 lg:col-span-3">
-                <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
-                  <h3 className="font-semibold max-md:w-full">Year</h3>
-                  <div className="flex text-base max-md:flex-col sm:gap-4">
-                    <h3>
-                      <strong>Year&apos;s Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.total_emission.year} kg of CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                    <h3>
-                      <strong>Year&apos;s Avg Emission: </strong>
-                      <span className="justify-self-start">
-                        {todayLogs.emission_stats.average_emission.year} kg of
-                        CO
-                        <sub>2</sub>
-                      </span>
-                    </h3>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <canvas id="year-graph" ref={yearChartCanvas}></canvas>
-                </CardBody>
-                <CardFooter>
-                  <h4 className="text-base">
-                    {maxYearVal === 0 ? (
-                      <>Add logs to view highest emission</>
-                    ) : (
-                      <>
-                        <strong>Highest emission: </strong>
-                        {capitalizeFirstLetter(maxYearKey)} produced{" "}
-                        {maxYearVal}
-                        kg of CO<sub>2</sub>
-                      </>
-                    )}
-                  </h4>
-                </CardFooter>
-              </Card>
-            </div>
-          </section>
-        )}
+            </>
+          </Tab>
+          <Tab key="waste" title="Waste"></Tab>
+          <Tab key="electricity" title="Electricity"></Tab>
+        </Tabs>
       </main>
     );
   }
