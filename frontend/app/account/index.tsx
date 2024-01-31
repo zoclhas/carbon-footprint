@@ -1,6 +1,6 @@
 "use client";
 
-import { TodayLogsProps, UserProps, Activities } from "@/payload-types";
+import { TodayLogsProps, UserProps, Activities, Wastes } from "@/payload-types";
 import {
   Button,
   Link,
@@ -62,7 +62,7 @@ export function Page() {
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
 
-  function createChart(canvasRef: any, data: Activities) {
+  function createChart(canvasRef: any, data: Activities | Wastes) {
     const ctx = canvasRef.current?.getContext("2d");
 
     if (ctx && Object.keys(data).length > 0) {
@@ -106,25 +106,46 @@ export function Page() {
     }
   }
   useEffect(() => {
-    if (Object.keys(todayLogs).length > 1 && tab === "travel") {
-      const todayChartCleanup = createChart(
-        todayChartCanvas,
-        todayLogs.activities.today,
-      );
-      const monthChartCleanup = createChart(
-        monthChartCanvas,
-        todayLogs.activities.month,
-      );
-      const yearChartCleanup = createChart(
-        yearChartCanvas,
-        todayLogs.activities.year,
-      );
+    if (Object.keys(todayLogs).length > 1) {
+      if (tab === "travel") {
+        const todayChartCleanup = createChart(
+          todayChartCanvas,
+          todayLogs.activities.today,
+        );
+        const monthChartCleanup = createChart(
+          monthChartCanvas,
+          todayLogs.activities.month,
+        );
+        const yearChartCleanup = createChart(
+          yearChartCanvas,
+          todayLogs.activities.year,
+        );
 
-      return function cleanup() {
-        todayChartCleanup && todayChartCleanup();
-        monthChartCleanup && monthChartCleanup();
-        yearChartCleanup && yearChartCleanup();
-      };
+        return function cleanup() {
+          todayChartCleanup && todayChartCleanup();
+          monthChartCleanup && monthChartCleanup();
+          yearChartCleanup && yearChartCleanup();
+        };
+      } else if (tab === "waste") {
+        const todayChartCleanup = createChart(
+          todayChartCanvas,
+          todayLogs.waste.stats.today,
+        );
+        const monthChartCleanup = createChart(
+          monthChartCanvas,
+          todayLogs.waste.stats.month,
+        );
+        const yearChartCleanup = createChart(
+          yearChartCanvas,
+          todayLogs.waste.stats.year,
+        );
+
+        return function cleanup() {
+          todayChartCleanup && todayChartCleanup();
+          monthChartCleanup && monthChartCleanup();
+          yearChartCleanup && yearChartCleanup();
+        };
+      }
     }
   }, [todayLogs, tab]);
 
@@ -263,52 +284,54 @@ export function Page() {
                   </div>
                 </div>
 
-                <ScrollShadow className="h-[420px]">
-                  {todaysLogsSort && todaysLogsSort.length > 0 && (
-                    <Accordion variant="splitted">
-                      {todaysLogsSort.map((log) => {
-                        const date = new Date(log.timestamp);
-                        const time = date.toLocaleString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                          hour12: true,
-                        });
+                {todaysLogsSort.length ? (
+                  <ScrollShadow className="h-[420px]">
+                    {todaysLogsSort && todaysLogsSort.length > 0 && (
+                      <Accordion variant="splitted">
+                        {todaysLogsSort.map((log) => {
+                          const date = new Date(log.timestamp);
+                          const time = date.toLocaleString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: true,
+                          });
 
-                        function capitalizeFirstLetter(str: string): string {
-                          return str.charAt(0).toUpperCase() + str.slice(1);
-                        }
+                          function capitalizeFirstLetter(str: string): string {
+                            return str.charAt(0).toUpperCase() + str.slice(1);
+                          }
 
-                        return (
-                          <AccordionItem key={log.id} title={time}>
-                            <ul>
-                              <li>
-                                <strong>Activity:</strong>&nbsp;
-                                <span>
-                                  {capitalizeFirstLetter(log.activity)}
-                                </span>
-                              </li>
-                              <li>
-                                <strong>Distance:</strong>&nbsp;
-                                <span>{log.distance} km</span>
-                              </li>
-                              <li>
-                                <strong>Person Count:</strong>&nbsp;
-                                <span>{log.people}</span>
-                              </li>
-                              <li>
-                                <strong>Emission:</strong>&nbsp;
-                                <span>
-                                  {log.emission} kg of CO<sub>2</sub>
-                                </span>
-                              </li>
-                            </ul>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
-                  )}
-                </ScrollShadow>
+                          return (
+                            <AccordionItem key={log.id} title={time}>
+                              <ul>
+                                <li>
+                                  <strong>Activity:</strong>&nbsp;
+                                  <span>
+                                    {capitalizeFirstLetter(log.activity)}
+                                  </span>
+                                </li>
+                                <li>
+                                  <strong>Distance:</strong>&nbsp;
+                                  <span>{log.distance} km</span>
+                                </li>
+                                <li>
+                                  <strong>Person Count:</strong>&nbsp;
+                                  <span>{log.people}</span>
+                                </li>
+                                <li>
+                                  <strong>Emission:</strong>&nbsp;
+                                  <span>
+                                    {log.emission} kg of CO<sub>2</sub>
+                                  </span>
+                                </li>
+                              </ul>
+                            </AccordionItem>
+                          );
+                        })}
+                      </Accordion>
+                    )}
+                  </ScrollShadow>
+                ) : null}
 
                 {todaysLogsSort.length === 0 && (
                   <Card>
@@ -465,7 +488,113 @@ export function Page() {
               )}
             </>
           </Tab>
-          <Tab key="waste" title="Waste"></Tab>
+          <Tab key="waste" title="Waste">
+            <section className="mt-6">
+              <section className="mt-6">
+                <h1 className="text-3xl font-semibold">Stats</h1>
+
+                <div className="mt-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <Card className="lg:col-span-2">
+                    <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                      <h3 className="font-semibold max-md:w-full">Today</h3>
+                      <div className="flex text-base max-md:flex-col sm:gap-4">
+                        <h3>
+                          <strong>Today&apos;s Emission: </strong>
+                          <span className="justify-self-start">
+                            {todayLogs.waste.total.today} kg of CO
+                            <sub>2</sub>
+                          </span>
+                        </h3>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <canvas id="today-graph" ref={todayChartCanvas}></canvas>
+                    </CardBody>
+                    <CardFooter>
+                      <h4 className="text-base">
+                        {maxTodayVal === 0 ? (
+                          <>Add logs to view highest emission</>
+                        ) : (
+                          <>
+                            <strong>Highest emission: </strong>
+                            {capitalizeFirstLetter(maxTodayKey)} produced{" "}
+                            {maxTodayVal}
+                            kg of CO<sub>2</sub>
+                          </>
+                        )}
+                      </h4>
+                    </CardFooter>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                      <h3 className="font-semibold max-md:w-full">Month</h3>
+                      <div className="flex text-base max-md:flex-col sm:gap-4">
+                        <h3>
+                          <strong>Month&apos;s Emission: </strong>
+                          <span className="justify-self-start">
+                            {todayLogs.waste.total.month} kg of CO
+                            <sub>2</sub>
+                          </span>
+                        </h3>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <canvas
+                        id="month-graph"
+                        ref={monthChartCanvas}
+                        height={298}
+                      ></canvas>
+                    </CardBody>
+                    <CardFooter>
+                      <h4 className="text-base">
+                        {maxMonthVal === 0 ? (
+                          <>Add logs to view highest emission</>
+                        ) : (
+                          <>
+                            <strong>Highest emission: </strong>
+                            {capitalizeFirstLetter(maxMonthKey)} produced{" "}
+                            {maxMonthVal}
+                            kg of CO<sub>2</sub>
+                          </>
+                        )}
+                      </h4>
+                    </CardFooter>
+                  </Card>
+                  <Card className="md:col-span-2 lg:col-span-3">
+                    <CardHeader className="flex justify-between gap-2 text-lg font-medium max-sm:flex-col sm:items-center">
+                      <h3 className="font-semibold max-md:w-full">Year</h3>
+                      <div className="flex text-base max-md:flex-col sm:gap-4">
+                        <h3>
+                          <strong>Year&apos;s Emission: </strong>
+                          <span className="justify-self-start">
+                            {todayLogs.waste.total.year} kg of CO
+                            <sub>2</sub>
+                          </span>
+                        </h3>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <canvas id="year-graph" ref={yearChartCanvas}></canvas>
+                    </CardBody>
+                    <CardFooter>
+                      <h4 className="text-base">
+                        {maxYearVal === 0 ? (
+                          <>Add logs to view highest emission</>
+                        ) : (
+                          <>
+                            <strong>Highest emission: </strong>
+                            {capitalizeFirstLetter(maxYearKey)} produced{" "}
+                            {maxYearVal}
+                            kg of CO<sub>2</sub>
+                          </>
+                        )}
+                      </h4>
+                    </CardFooter>
+                  </Card>
+                </div>
+              </section>
+            </section>
+          </Tab>
           <Tab key="electricity" title="Electricity"></Tab>
         </Tabs>
       </main>

@@ -116,6 +116,7 @@ export interface TodayLogsProps {
     year: Activities;
   };
   message?: string;
+  waste: WasteResponse;
   user: {
     is_class_teacher: boolean;
     is_supervisor: boolean;
@@ -199,6 +200,7 @@ export interface ClassStudent {
     month: Activities;
     year: Activities;
   };
+  waste: WasteResponse;
   student: {
     name: string;
     class: string;
@@ -303,4 +305,25 @@ export interface SectionsProps {
     year: Emissions;
   };
   message?: string;
+}
+
+export interface WasteResponse {
+  stats: {
+    today: Wastes;
+    month: Wastes;
+    year: Wastes;
+  };
+  total: {
+    today: number;
+    month: number;
+    year: number;
+  };
+}
+
+export interface Wastes {
+  ewaste: number;
+  plastic: number;
+  paper: number;
+  glass: number;
+  can: number;
 }

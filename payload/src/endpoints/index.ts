@@ -25,6 +25,8 @@ export const endpoints: Endpoint[] = [
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
+        const date = new Date();
+
         const data = await payload.find({
           collection: "footprint",
           where: {
@@ -56,6 +58,82 @@ export const endpoints: Endpoint[] = [
 
         const roles = user.roles;
 
+        const todayWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: uid,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date().setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+        const monthWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: uid,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      date.getMonth(),
+                      1
+                    ).setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+        const yearWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: uid,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      0,
+                      1
+                    ).setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+
+        const todayEmission = calculateWasteTotalEmissions(todayWastes);
+        const monthEmission = calculateWasteTotalEmissions(monthWastes);
+        const yearEmission = calculateWasteTotalEmissions(yearWastes);
+        const totalWasteToday = calcTotalWaste(todayEmission);
+        const totalWasteMonth = calcTotalWaste(monthEmission);
+        const totalWasteYear = calcTotalWaste(yearEmission);
+
         if (roles.includes("teacher")) {
           const classData = await payload.find({
             collection: "classes",
@@ -80,6 +158,18 @@ export const endpoints: Endpoint[] = [
                 month: monthsActivitiesEmission,
                 year: yearsActivitiesEmission,
               },
+              waste: {
+                stats: {
+                  today: todayEmission,
+                  month: monthEmission,
+                  year: yearEmission,
+                },
+                total: {
+                  today: totalWasteToday,
+                  month: totalWasteMonth,
+                  year: totalWasteYear,
+                },
+              },
               user: {
                 is_class_teacher: false,
                 is_principal: false,
@@ -97,6 +187,18 @@ export const endpoints: Endpoint[] = [
               today: todaysActivitiesEmission,
               month: monthsActivitiesEmission,
               year: yearsActivitiesEmission,
+            },
+            waste: {
+              stats: {
+                today: todayEmission,
+                month: monthEmission,
+                year: yearEmission,
+              },
+              total: {
+                today: totalWasteToday,
+                month: totalWasteMonth,
+                year: totalWasteYear,
+              },
             },
             user: {
               is_class_teacher: true,
@@ -134,6 +236,18 @@ export const endpoints: Endpoint[] = [
                 month: monthsActivitiesEmission,
                 year: yearsActivitiesEmission,
               },
+              waste: {
+                stats: {
+                  today: todayEmission,
+                  month: monthEmission,
+                  year: yearEmission,
+                },
+                total: {
+                  today: totalWasteToday,
+                  month: totalWasteMonth,
+                  year: totalWasteYear,
+                },
+              },
               user: {
                 is_class_teacher: false,
                 is_supervisor: true,
@@ -157,6 +271,18 @@ export const endpoints: Endpoint[] = [
             today: todaysActivitiesEmission,
             month: monthsActivitiesEmission,
             year: yearsActivitiesEmission,
+          },
+          waste: {
+            stats: {
+              today: todayEmission,
+              month: monthEmission,
+              year: yearEmission,
+            },
+            total: {
+              today: totalWasteToday,
+              month: totalWasteMonth,
+              year: totalWasteYear,
+            },
           },
           user: {
             is_class_teacher: false,
@@ -636,6 +762,7 @@ export const endpoints: Endpoint[] = [
         const logs = data.docs[0].logs;
         let emissionStats = data.docs[0].emission_stats;
 
+        const date = new Date();
         const {
           todayLogs,
           todaysActivitiesEmission,
@@ -644,6 +771,82 @@ export const endpoints: Endpoint[] = [
           emission_stats,
         } = calculateEmissionStats(logs, emissionStats);
 
+        const todayWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: student_id,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date().setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+        const monthWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: student_id,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      date.getMonth(),
+                      1
+                    ).setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+        const yearWastes = await payload
+          .find({
+            collection: "waste",
+            where: {
+              and: [
+                {
+                  user: {
+                    equals: student_id,
+                  },
+                },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      0,
+                      1
+                    ).setHours(0, 0, 0),
+                  },
+                },
+              ],
+            },
+            depth: 0,
+          })
+          .then((res) => res.docs);
+
+        const todayEmission = calculateWasteTotalEmissions(todayWastes);
+        const monthEmission = calculateWasteTotalEmissions(monthWastes);
+        const yearEmission = calculateWasteTotalEmissions(yearWastes);
+        const totalWasteToday = calcTotalWaste(todayEmission);
+        const totalWasteMonth = calcTotalWaste(monthEmission);
+        const totalWasteYear = calcTotalWaste(yearEmission);
+
         res.status(200).json({
           emission_stats,
           logs: todayLogs,
@@ -651,6 +854,18 @@ export const endpoints: Endpoint[] = [
             today: todaysActivitiesEmission,
             month: monthsActivitiesEmission,
             year: yearsActivitiesEmission,
+          },
+          waste: {
+            stats: {
+              today: todayEmission,
+              month: monthEmission,
+              year: yearEmission,
+            },
+            total: {
+              today: totalWasteToday,
+              month: totalWasteMonth,
+              year: totalWasteYear,
+            },
           },
           student: {
             name: data.docs[0].user["name"],
@@ -1136,4 +1351,47 @@ export interface Log {
   people: number;
   emission?: number;
   id?: string;
+}
+
+interface Waste {
+  id: string;
+  user: string | User;
+  timestamp: string;
+  waste: "ewaste" | "plastic" | "paper" | "glass" | "can";
+  quantity: number;
+  emission?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+
+interface TotalEmissions {
+  [wasteType: string]: number;
+}
+
+function calculateWasteTotalEmissions(wastes: Waste[]): TotalEmissions {
+  const totalEmissions: TotalEmissions = {
+    ewaste: 0,
+    plastic: 0,
+    paper: 0,
+    glass: 0,
+    can: 0,
+  };
+
+  wastes.forEach((waste) => {
+    const { waste: wasteType, emission } = waste;
+
+    if (emission !== undefined && emission !== null) {
+      totalEmissions[wasteType] = (totalEmissions[wasteType] || 0) + emission;
+    }
+  });
+
+  return totalEmissions;
+}
+
+function calcTotalWaste(wastes: TotalEmissions): number {
+  return Number(
+    Object.values(wastes)
+      .reduce((total, a) => total + a, 0)
+      .toFixed(2)
+  );
 }

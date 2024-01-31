@@ -15,6 +15,8 @@ export interface Config {
     events: Event;
     messages: Message;
     surverys: Survery;
+    waste: Waste;
+    electricity: Electricity;
     media: Media;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -112,8 +114,25 @@ export interface Message {
 export interface Survery {
   id: string;
   user: string | User;
-  cooking: 'non_clean' | 'clean';
-  vehicle: 'non_electric' | 'Electric';
+  cooking: 'non_clean' | 'clean' | 'none';
+  vehicle: 'non_electric' | 'electric';
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Waste {
+  id: string;
+  user: string | User;
+  timestamp: string;
+  waste: 'ewaste' | 'plastic' | 'paper' | 'glass' | 'can';
+  quantity: number;
+  emission?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Electricity {
+  id: string;
+  user: string | User;
+  consumption: number;
   updatedAt: string;
   createdAt: string;
 }
