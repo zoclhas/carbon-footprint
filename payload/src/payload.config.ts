@@ -25,6 +25,7 @@ import { eventsEndpoints } from "./endpoints/events";
 import { supervisorEndpoints } from "./endpoints/supervisor";
 import { principalEndpoints } from "./endpoints/principal";
 import { surverysEndpoints } from "./endpoints/surverys";
+import { electricityEndpoints } from "./endpoints/electricity";
 
 export default buildConfig({
   admin: {
@@ -101,5 +102,6 @@ export default buildConfig({
     ...supervisorEndpoints,
     ...principalEndpoints,
     ...surverysEndpoints,
+    ...electricityEndpoints,
   ],
 });

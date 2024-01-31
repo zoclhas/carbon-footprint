@@ -21,10 +21,6 @@ const Surverys: CollectionConfig = {
           label: "Clean",
           value: "clean",
         },
-        {
-          label: "None",
-          value: "none",
-        },
       ],
       required: true,
     },
@@ -39,6 +35,10 @@ const Surverys: CollectionConfig = {
         {
           label: "Electric",
           value: "electric",
+        },
+        {
+          label: "None",
+          value: "none",
         },
       ],
       required: true,

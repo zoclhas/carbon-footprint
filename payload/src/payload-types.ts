@@ -131,6 +131,7 @@ export interface Waste {
 }
 export interface Electricity {
   id: string;
+  timestamp: string;
   user: string | User;
   consumption: number;
   updatedAt: string;

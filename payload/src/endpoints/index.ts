@@ -134,6 +134,54 @@ export const endpoints: Endpoint[] = [
         const totalWasteMonth = calcTotalWaste(monthEmission);
         const totalWasteYear = calcTotalWaste(yearEmission);
 
+        const electricityDocs = await payload
+          .find({
+            collection: "electricity",
+            where: {
+              and: [
+                { user: { equals: uid } },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      0,
+                      1
+                    ).setHours(0, 0, 0),
+                    less_than_equal: new Date(
+                      date.getFullYear(),
+                      11,
+                      31
+                    ).setHours(24, 60, 60),
+                  },
+                },
+              ],
+            },
+          })
+          .then((res) => res.docs);
+        const electricity = {
+          january: 0,
+          february: 0,
+          march: 0,
+          april: 0,
+          may: 0,
+          june: 0,
+          july: 0,
+          august: 0,
+          september: 0,
+          october: 0,
+          november: 0,
+          december: 0,
+        };
+
+        electricityDocs.forEach((doc) => {
+          const docDate = new Date(doc.timestamp);
+          const month = docDate
+            .toLocaleString("en-US", { month: "long" })
+            .toLowerCase();
+
+          electricity[month] = doc.consumption || 0;
+        });
+
         if (roles.includes("teacher")) {
           const classData = await payload.find({
             collection: "classes",
@@ -170,6 +218,7 @@ export const endpoints: Endpoint[] = [
                   year: totalWasteYear,
                 },
               },
+              electricity,
               user: {
                 is_class_teacher: false,
                 is_principal: false,
@@ -200,6 +249,7 @@ export const endpoints: Endpoint[] = [
                 year: totalWasteYear,
               },
             },
+            electricity,
             user: {
               is_class_teacher: true,
               is_principal: false,
@@ -248,6 +298,7 @@ export const endpoints: Endpoint[] = [
                   year: totalWasteYear,
                 },
               },
+              electricity,
               user: {
                 is_class_teacher: false,
                 is_supervisor: true,
@@ -284,6 +335,7 @@ export const endpoints: Endpoint[] = [
               year: totalWasteYear,
             },
           },
+          electricity,
           user: {
             is_class_teacher: false,
             is_principal: roles.includes("principal"),
@@ -847,6 +899,54 @@ export const endpoints: Endpoint[] = [
         const totalWasteMonth = calcTotalWaste(monthEmission);
         const totalWasteYear = calcTotalWaste(yearEmission);
 
+        const electricityDocs = await payload
+          .find({
+            collection: "electricity",
+            where: {
+              and: [
+                { user: { equals: student_id } },
+                {
+                  timestamp: {
+                    greater_than_equal: new Date(
+                      date.getFullYear(),
+                      0,
+                      1
+                    ).setHours(0, 0, 0),
+                    less_than_equal: new Date(
+                      date.getFullYear(),
+                      11,
+                      31
+                    ).setHours(24, 60, 60),
+                  },
+                },
+              ],
+            },
+          })
+          .then((res) => res.docs);
+        const electricity = {
+          january: 0,
+          february: 0,
+          march: 0,
+          april: 0,
+          may: 0,
+          june: 0,
+          july: 0,
+          august: 0,
+          september: 0,
+          october: 0,
+          november: 0,
+          december: 0,
+        };
+
+        electricityDocs.forEach((doc) => {
+          const docDate = new Date(doc.timestamp);
+          const month = docDate
+            .toLocaleString("en-US", { month: "long" })
+            .toLowerCase();
+
+          electricity[month] = doc.consumption || 0;
+        });
+
         res.status(200).json({
           emission_stats,
           logs: todayLogs,
@@ -867,6 +967,7 @@ export const endpoints: Endpoint[] = [
               year: totalWasteYear,
             },
           },
+          electricity,
           student: {
             name: data.docs[0].user["name"],
             class: checkIfStudentInClass.docs[0].combined_class_section,

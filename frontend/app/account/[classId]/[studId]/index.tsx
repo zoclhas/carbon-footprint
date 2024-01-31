@@ -85,8 +85,12 @@ export function StudentIdPage({
   const todayChartCanvas = useRef<HTMLCanvasElement>(null);
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
+  const electricityYearChartCanvas = useRef<HTMLCanvasElement>(null);
 
-  function createChart(canvasRef: any, data: Activities | Wastes) {
+  function createChart(
+    canvasRef: any,
+    data: Activities | Wastes | Record<string, string>,
+  ) {
     const ctx = canvasRef.current?.getContext("2d");
 
     if (ctx && Object.keys(data).length > 0) {
@@ -169,6 +173,15 @@ export function StudentIdPage({
           monthChartCleanup && monthChartCleanup();
           yearChartCleanup && yearChartCleanup();
         };
+      } else if (tab === "electricity") {
+        const yearlyElectricityCleanup = createChart(
+          electricityYearChartCanvas,
+          student.electricity,
+        );
+
+        return function cleanup() {
+          yearlyElectricityCleanup && yearlyElectricityCleanup();
+        };
       }
     }
   }, [student, tab]);
@@ -222,13 +235,16 @@ export function StudentIdPage({
 
   if (student && Object.keys(student).length > 1) {
     const [maxTodayKey, maxTodayVal] = Object.entries(
-      student.activities.today,
+      tab === "travel" ? student.activities.today : student.waste.stats.today,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxMonthKey, maxMonthVal] = Object.entries(
-      student.activities.month,
+      tab === "travel" ? student.activities.month : student.waste.stats.month,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxYearKey, maxYearVal] = Object.entries(
-      student.activities.year,
+      tab === "travel" ? student.activities.year : student.waste.stats.year,
+    ).reduce((a, b) => (a[1] > b[1] ? a : b));
+    const [maxElectricityKey, maxElectricityVal] = Object.entries(
+      student.electricity,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
 
     return (
@@ -645,7 +661,25 @@ export function StudentIdPage({
                 </section>
               </section>
             </Tab>
-            <Tab key="electricity" title="Electricity"></Tab>
+            <Tab key="electricity" title="Electricity">
+              <section className="mt-6">
+                <Card className="md:col-span-2 lg:col-span-3">
+                  <CardBody>
+                    <canvas
+                      id="year-graph"
+                      ref={electricityYearChartCanvas}
+                    ></canvas>
+                  </CardBody>
+                  <CardFooter>
+                    <h4 className="text-base">
+                      <strong>Highest emission: </strong>
+                      {capitalizeFirstLetter(maxElectricityKey)} with{" "}
+                      {maxElectricityVal} kWh
+                    </h4>
+                  </CardFooter>
+                </Card>
+              </section>
+            </Tab>
           </Tabs>
         )}
       </main>

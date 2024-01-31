@@ -4,6 +4,17 @@ const Electricity: CollectionConfig = {
   slug: "electricity",
   fields: [
     {
+      name: "timestamp",
+      type: "date",
+      defaultValue: new Date().toISOString(),
+      required: true,
+      admin: {
+        date: {
+          pickerAppearance: "dayAndTime",
+        },
+      },
+    },
+    {
       name: "user",
       type: "relationship",
       relationTo: "users",

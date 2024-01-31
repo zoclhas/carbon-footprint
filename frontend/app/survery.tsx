@@ -65,7 +65,7 @@ export default function Survey() {
     if (
       user &&
       ["clean", "non_clean"].includes(cook) &&
-      ["electric", "non_electric"].includes(vehicle)
+      ["electric", "non_electric", "none"].includes(vehicle)
     ) {
       const res = await fetch(process.env.NEXT_PUBLIC_API + "/api/set-survey", {
         method: "post",

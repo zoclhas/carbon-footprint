@@ -61,8 +61,12 @@ export function Page() {
   const todayChartCanvas = useRef<HTMLCanvasElement>(null);
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
+  const electricityYearChartCanvas = useRef<HTMLCanvasElement>(null);
 
-  function createChart(canvasRef: any, data: Activities | Wastes) {
+  function createChart(
+    canvasRef: any,
+    data: Activities | Wastes | Record<string, string>,
+  ) {
     const ctx = canvasRef.current?.getContext("2d");
 
     if (ctx && Object.keys(data).length > 0) {
@@ -145,6 +149,15 @@ export function Page() {
           monthChartCleanup && monthChartCleanup();
           yearChartCleanup && yearChartCleanup();
         };
+      } else if (tab === "electricity") {
+        const yearlyElectricityCleanup = createChart(
+          electricityYearChartCanvas,
+          todayLogs.electricity,
+        );
+
+        return function cleanup() {
+          yearlyElectricityCleanup && yearlyElectricityCleanup();
+        };
       }
     }
   }, [todayLogs, tab]);
@@ -176,13 +189,20 @@ export function Page() {
 
   if (todayLogs && Object.keys(todayLogs).length > 1) {
     const [maxTodayKey, maxTodayVal] = Object.entries(
-      todayLogs.activities.today,
+      tab === "travel"
+        ? todayLogs.activities.today
+        : todayLogs.waste.stats.today,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxMonthKey, maxMonthVal] = Object.entries(
-      todayLogs.activities.month,
+      tab === "travel"
+        ? todayLogs.activities.month
+        : todayLogs.waste.stats.month,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
     const [maxYearKey, maxYearVal] = Object.entries(
-      todayLogs.activities.year,
+      tab === "travel" ? todayLogs.activities.year : todayLogs.waste.stats.year,
+    ).reduce((a, b) => (a[1] > b[1] ? a : b));
+    const [maxElectricityKey, maxElectricityVal] = Object.entries(
+      todayLogs.electricity,
     ).reduce((a, b) => (a[1] > b[1] ? a : b));
 
     return (
@@ -595,7 +615,25 @@ export function Page() {
               </section>
             </section>
           </Tab>
-          <Tab key="electricity" title="Electricity"></Tab>
+          <Tab key="electricity" title="Electricity">
+            <section className="mt-6">
+              <Card className="md:col-span-2 lg:col-span-3">
+                <CardBody>
+                  <canvas
+                    id="year-graph"
+                    ref={electricityYearChartCanvas}
+                  ></canvas>
+                </CardBody>
+                <CardFooter>
+                  <h4 className="text-base">
+                    <strong>Highest emission: </strong>
+                    {capitalizeFirstLetter(maxElectricityKey)} with{" "}
+                    {maxElectricityVal} kWh
+                  </h4>
+                </CardFooter>
+              </Card>
+            </section>
+          </Tab>
         </Tabs>
       </main>
     );

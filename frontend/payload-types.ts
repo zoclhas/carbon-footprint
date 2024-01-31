@@ -117,6 +117,7 @@ export interface TodayLogsProps {
   };
   message?: string;
   waste: WasteResponse;
+  electricity: Record<string, string>;
   user: {
     is_class_teacher: boolean;
     is_supervisor: boolean;
@@ -201,6 +202,7 @@ export interface ClassStudent {
     year: Activities;
   };
   waste: WasteResponse;
+  electricity: Record<string, string>;
   student: {
     name: string;
     class: string;

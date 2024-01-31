@@ -16,7 +16,7 @@ import {
 import { Bike, Plus, Trash2 } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { getCookie } from "cookies-next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Page() {
   const router = useRouter();
@@ -24,6 +24,30 @@ export function Page() {
   // @ts-ignore
   const user: UserProps | null = JSON.parse(getCookie("user") ?? "null");
   const userDetails = user && user.user;
+
+  const [checkElectricity, setCheckElectricity] = useState(false);
+
+  useEffect(() => {
+    async function checkElecy() {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/check-electricity`,
+        {
+          headers: {
+            Authorization: `users API-Key ${user!.user.apiKey}`,
+          },
+        },
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        setCheckElectricity(!data.present);
+      }
+    }
+
+    if (user) {
+      checkElecy();
+    }
+  }, []);
 
   const date = new Date();
   const rightNow = date.toLocaleString("en-GB", {
@@ -96,6 +120,34 @@ export function Page() {
       router.push("/account");
     }
   };
+  const electricitySubmitHandler = async (data: FormData) => {
+    const apiKey = userDetails!.apiKey;
+    const consumption = data.get("consumption")!;
+
+    const log = {
+      user: user!.user.id,
+      timestamp: rightNowISO,
+      consumption: Number(consumption),
+    };
+
+    const headers = new Headers();
+    headers.append("Authorization", `users API-Key ${apiKey}`);
+    headers.append("Content-Type", "application/json");
+
+    const res = await fetch(
+      process.env.NEXT_PUBLIC_API + "/api/add-electricity",
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(log),
+      },
+    );
+    const updatedData = await res.json();
+
+    if (updatedData && res.ok) {
+      router.push("/account");
+    }
+  };
 
   return (
     <main className="mx-auto max-w-7xl p-5 pt-10">
@@ -107,7 +159,7 @@ export function Page() {
         onSelectionChange={setTab as any}
         className="mt-6"
       >
-        <Tab value="travel" title="Travel">
+        <Tab key="travel" title="Travel">
           <form
             className="mt-4"
             onSubmit={(e) => {
@@ -213,7 +265,42 @@ export function Page() {
             </Card>
           </form>
         </Tab>
-        <Tab key="electricity" title="Electricity"></Tab>
+        {checkElectricity && (
+          <Tab key="electricity" title="Electricity">
+            <form
+              className="mt-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                electricitySubmitHandler(new FormData(e.currentTarget));
+              }}
+            >
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl">{rightNow}</h2>
+                </CardHeader>
+                <CardBody className="flex flex-col gap-2">
+                  <Input
+                    name="consumption"
+                    label="Consumption for this month (kWh)"
+                    type="number"
+                    isRequired
+                  />
+                </CardBody>
+
+                <CardFooter className="flex justify-end">
+                  <Button
+                    type="submit"
+                    color="success"
+                    variant="flat"
+                    startContent={<Plus />}
+                  >
+                    Add
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Tab>
+        )}
       </Tabs>
     </main>
   );
