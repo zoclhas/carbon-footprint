@@ -17,15 +17,15 @@ export default function Register({
   const messageBg = success === "true" ? "bg-success-50" : "bg-danger-50";
 
   return (
-    <main className="min-h-[80vh] flex items-center justify-center px-4 gap-2 flex-col">
+    <main className="flex min-h-[80vh] flex-col items-center justify-center gap-2 px-4">
       {message && (
         <Card className={`${messageBg} max-w-[450px] w-full`}>
           <CardBody>{message.split("+").join(" ")}</CardBody>
         </Card>
       )}
       <Form />
-      <div className="max-w-[450px] w-full flex justify-between gap-4 flex-wrap">
-        <Link href="/register" color="success">
+      <div className="flex w-full max-w-[450px] flex-wrap justify-between gap-4">
+        <Link href="/login" color="success">
           Login
         </Link>
       </div>

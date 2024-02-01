@@ -19,4 +19,18 @@ body {
   section {
     @apply mt-10;
   }
+
+  ul {
+    @apply pl-4;
+
+    li {
+      @apply list-disc;
+    }
+  }
+
+  ul.decimal {
+    li {
+      @apply text-xl list-decimal;
+    }
+  }
 }

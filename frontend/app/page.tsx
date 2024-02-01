@@ -1,10 +1,11 @@
 import { Button, Link } from "@nextui-org/react";
 import Image from "next/image";
+import Markdown from "react-markdown";
 
 export default function Home() {
   return (
     <main>
-      <section className="mx-auto max-w-7xl px-4 py-20 min-h-[calc(100vh-65px)] grid grid-cols-1 md:grid-cols-2 items-center justify-center overflow-hidden w-screen relative">
+      <section className="relative mx-auto grid min-h-[calc(100vh-65px)] w-screen max-w-7xl grid-cols-1 items-center justify-center overflow-hidden px-4 py-20 md:grid-cols-2">
         <div className="flex flex-col">
           <h1 className="text-6xl font-semibold">CarbTrkr</h1>
           <h2 className="text-2xl">(Your carbon footprint tracker)</h2>
@@ -34,6 +35,16 @@ export default function Home() {
             >
               Learn More
             </Button>
+            <Button
+              as={Link}
+              href="/cop28"
+              size="lg"
+              variant="light"
+              color="success"
+              className="w-max"
+            >
+              COP28
+            </Button>
           </div>
         </div>
 
@@ -43,14 +54,14 @@ export default function Home() {
           loading="eager"
           height={576}
           width={1000}
-          className="object-cover object-center rotate-90 -scale-y-100 max-md:absolute max-md:-z-[1] max-md:opacity-20 max-md:scale-y-100 max-md:top-44 left-40"
+          className="left-40 rotate-90 -scale-y-100 object-cover object-center max-md:absolute max-md:top-44 max-md:-z-[1] max-md:scale-y-100 max-md:opacity-20"
         />
       </section>
 
       <svg
         viewBox="0 0 1000 1000"
         xmlns="http://www.w3.org/2000/svg"
-        className="absolute blur-3xl -z-[2] opacity-10 left-0 -bottom-64 max-sm:top-20"
+        className="absolute -bottom-64 left-0 -z-[2] opacity-10 blur-3xl max-sm:top-20"
       >
         <defs>
           <clipPath id="a">
@@ -73,10 +84,28 @@ export default function Home() {
           {more.map((m, i) => (
             <li
               key={i}
-              className="p-4 rounded-2xl backdrop-blur-2xl bg-default-50/40"
+              className="bg-default-50/40 rounded-2xl p-4 backdrop-blur-2xl"
             >
               <h1 className="text-4xl font-medium">{m.q}</h1>
-              <p className="text-xl mt-2">{m.a}</p>
+              <Markdown
+                components={{
+                  p(props) {
+                    return <p className="mt-2 text-xl">{props.children}</p>;
+                  },
+                  ul(props) {
+                    return <ul className="pl-4">{props.children}</ul>;
+                  },
+                  li(props) {
+                    return (
+                      <li className="ml-4 list-decimal text-xl">
+                        {props.children}
+                      </li>
+                    );
+                  },
+                }}
+              >
+                {m.a}
+              </Markdown>
             </li>
           ))}
         </ul>
@@ -97,5 +126,42 @@ const more = [
   {
     q: "How can I get started?",
     a: "Start by creating your account, then it will automatically redirect you to your account page. You can start adding logs there. And your school may add you to their list!",
+  },
+  {
+    q: "How to dispose e-waste?",
+    a: `Electronic waste, or e-waste, refers to discarded electronic devices such as computers, smartphones, TVs, and other electronic gadgets. Proper disposal of e-waste is crucial to prevent environmental pollution and health hazards. Here are several methods to dispose of e-waste:
+
+
+
+1. **Recycling Centers:**
+   - Many countries and regions have dedicated e-waste recycling centers. These facilities are equipped to handle the proper dismantling and recycling of electronic components.
+   - Check with local authorities or waste management agencies for information on nearby e-waste recycling centers.
+
+2. **Manufacturer Take-Back Programs:**
+   - Some electronics manufacturers have take-back programs where they accept old products for recycling. Check with the manufacturer of your device to see if they offer such a program.
+
+3. **Retailer Drop-Off Programs:**
+   - Some electronics retailers have drop-off programs where you can return old devices. They may partner with recycling facilities to ensure proper disposal.
+
+4. **Community E-Waste Collection Events:**
+   - Local communities or environmental organizations occasionally organize e-waste collection events. Residents can bring their old electronics to a specified location for proper disposal.
+
+5. **Mail-Back Programs:**
+   - Some companies offer mail-back programs, allowing you to send your old electronics to them for proper recycling. This can be a convenient option for smaller devices.
+
+6. **Donation to Charities or Schools:**
+   - Consider donating still-functioning electronic devices to charities, schools, or community organizations. This helps extend the life of the product and benefits others who may not afford new electronics.
+
+7. **Refurbishing and Reselling:**
+   - Companies that specialize in refurbishing electronics may accept old devices. These companies restore and resell the products, reducing waste and extending the lifespan of the electronics.
+
+8. **Data Destruction and Secure Disposal:**
+   - Before disposing of any electronic device, ensure that all personal and sensitive data is securely wiped. Many e-waste disposal methods involve data destruction as part of the process.
+
+9. **Landfill Disposal (as a last resort):**
+   - Landfill disposal should be the last resort due to the environmental impact. Many electronic components contain hazardous materials that can contaminate soil and water if not properly handled.
+
+It's important to follow local regulations and guidelines for e-waste disposal, as different areas may have specific rules and facilities for handling electronic waste. Always prioritize environmentally friendly methods to minimize the impact on the planet.
+`,
   },
 ];

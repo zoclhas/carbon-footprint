@@ -1,4 +1,21 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        hostname: "*.desmog.com",
+      },
+      {
+        hostname: "localhost:3001",
+      },
+      {
+        hostname: "*.unfccc.int",
+      },
+      {
+        hostname: "*.amazonaws.com",
+      },
+    ],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
