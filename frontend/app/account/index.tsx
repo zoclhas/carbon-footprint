@@ -15,17 +15,29 @@ import {
   Tabs,
   Tab,
   ScrollShadow,
+  Modal,
+  useDisclosure,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  RadioGroup,
+  Radio,
+  Input,
+  ModalFooter,
 } from "@nextui-org/react";
-import { GraduationCap, Plus } from "lucide-react";
+import { GraduationCap, CircleDollarSign, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Chart from "chart.js/auto";
 import { colors } from "./[classId]";
 import { getCookie } from "cookies-next";
 import { titleWord } from "@/lib/title-str";
+import { subscribe } from "diagnostics_channel";
 
 export function Page() {
   const router = useRouter();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"travel" | "waste" | "electricity">("travel");
   //@ts-ignore
@@ -184,6 +196,28 @@ export function Page() {
     );
   }
 
+  const submitHandler = async (form: FormData, onClose: () => void) => {
+    const donation_type = form.get("donationType");
+    const qty = form.get("amount");
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/donation`, {
+      method: "POST",
+      headers: {
+        Authorization: `users API-Key ${user!.user.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        donation_type,
+        qty,
+        user: user!.user.id,
+      }),
+    });
+
+    if (res.ok) {
+      onClose();
+    }
+  };
+
   const todaysLogsSort =
     !loading && todayLogs ? [...todayLogs.logs].reverse() : [];
 
@@ -259,6 +293,50 @@ export function Page() {
               </Tooltip>
             )}
           </div>
+
+          <Button
+            variant="light"
+            size="lg"
+            color="success"
+            startContent={<CircleDollarSign />}
+            onPress={onOpen}
+          >
+            Give Donation
+          </Button>
+          <Modal backdrop="blur" isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalContent>
+              {(onClose) => (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitHandler(new FormData(e.currentTarget), onClose);
+                  }}
+                >
+                  <ModalHeader>Donate!</ModalHeader>
+                  <ModalBody>
+                    <RadioGroup
+                      orientation="horizontal"
+                      name="donationType"
+                      isRequired
+                      defaultValue="plant"
+                    >
+                      <Radio value="plant">Plant</Radio>
+                      <Radio value="money">Money</Radio>
+                    </RadioGroup>
+                    <Input
+                      label="Amount"
+                      type="number"
+                      name="amount"
+                      required
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button type="submit">Submit</Button>
+                  </ModalFooter>
+                </form>
+              )}
+            </ModalContent>
+          </Modal>
 
           <Button
             as={Link}

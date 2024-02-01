@@ -18,6 +18,7 @@ import Messages from "./collections/Messages";
 import Surverys from "./collections/Surveys";
 import Waste from "./collections/Waste";
 import Electricity from "./collections/Electricity";
+import Donation from "./collections/Donation";
 
 import { slateOptions } from "./lib/slate-options";
 import { endpoints } from "./endpoints";
@@ -43,6 +44,7 @@ export default buildConfig({
     Surverys,
     Waste,
     Electricity,
+    Donation,
     Media,
   ],
   typescript: {
