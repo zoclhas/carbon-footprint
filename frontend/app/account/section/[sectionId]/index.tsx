@@ -87,6 +87,7 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
   const todayChartCanvas = useRef<HTMLCanvasElement>(null);
   const monthChartCanvas = useRef<HTMLCanvasElement>(null);
   const yearChartCanvas = useRef<HTMLCanvasElement>(null);
+  const comparisitionChartCanvas = useRef<HTMLCanvasElement>(null);
 
   function createChart(canvasRef: any, data: Activities) {
     const ctx = canvasRef.current?.getContext("2d");
@@ -131,6 +132,40 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
       };
     }
   }
+  function createComparisionChart() {
+    const ctx = comparisitionChartCanvas.current?.getContext("2d");
+    const classes = sectionDetails?.my_section.classes!;
+    const data = {
+      labels: classes.map((cls) => cls.combined_class_section),
+      datasets: [
+        {
+          label: "Total / CO2 (kg)",
+          backgroundColor: colors.dGreen.default,
+          data: classes.map((cls) => cls.emissions_stats.todays_emission.total),
+        },
+        {
+          label: "Average / CO2 (kg)",
+          backgroundColor: colors.dGreen.quarter,
+          data: classes.map((cls) => cls.emissions_stats.todays_emission.avg),
+        },
+      ],
+    };
+
+    const config = {
+      type: "bar",
+      data,
+      options: {
+        responsive: true,
+      },
+    };
+
+    // @ts-ignore
+    const myLineChart = new Chart(ctx, config);
+
+    return function cleanup() {
+      myLineChart.destroy();
+    };
+  }
   useEffect(() => {
     if (sectionDetails && Object.keys(sectionDetails).length > 1) {
       const todayChartCleanup = createChart(
@@ -145,11 +180,13 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
         yearChartCanvas,
         sectionDetails.emissions_stats.year.activties,
       );
+      const comparisionChartCleanup = createComparisionChart();
 
       return function cleanup() {
         todayChartCleanup && todayChartCleanup();
         monthChartCleanup && monthChartCleanup();
         yearChartCleanup && yearChartCleanup();
+        comparisionChartCleanup && comparisionChartCleanup();
       };
     }
   }, [currTab, sectionDetails]);
@@ -414,6 +451,11 @@ export default function SectionPage({ sectionId }: { sectionId: string }) {
                 ))}
               </TableBody>
             </Table>
+
+            <Card className="mt-6">
+              <CardHeader>Class-wise Analysis</CardHeader>
+              <canvas ref={comparisitionChartCanvas} />
+            </Card>
           </section>
         )}
 
