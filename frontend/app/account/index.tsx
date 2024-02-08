@@ -78,6 +78,7 @@ export function Page() {
   function createChart(
     canvasRef: any,
     data: Activities | Wastes | Record<string, string>,
+    electricity?: boolean,
   ) {
     const ctx = canvasRef.current?.getContext("2d");
 
@@ -95,7 +96,7 @@ export function Page() {
         datasets: [
           {
             backgroundColor: gradient,
-            label: "Activity / CO2 (kg)",
+            label: !electricity ? "Activity / CO2 (kg)" : "Usage / kWh",
             data: weight,
             fill: true,
             borderWidth: 2,
@@ -165,6 +166,7 @@ export function Page() {
         const yearlyElectricityCleanup = createChart(
           electricityYearChartCanvas,
           todayLogs.electricity,
+          true,
         );
 
         return function cleanup() {

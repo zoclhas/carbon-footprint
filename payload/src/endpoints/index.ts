@@ -402,12 +402,13 @@ export const endpoints: Endpoint[] = [
           where: {
             and: [
               {
-                "user.id": {
+                user: {
                   equals: user.id,
                 },
               },
             ],
           },
+          depth: 0,
         });
         const currentLogs = footprint.docs[0].logs;
         const newLogs = [...currentLogs, log];
